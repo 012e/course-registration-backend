@@ -1,0 +1,25 @@
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: my-grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus
+    container_name: my-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+    ports:
+      - '9090:9090'
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus-storage:/prometheus
+
+volumes:
+  grafana-storage: {}
+  prometheus-storage: {}

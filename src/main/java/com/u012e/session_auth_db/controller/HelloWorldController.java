@@ -16,4 +16,13 @@ public class HelloWorldController {
                 .success(true)
                 .build();
     }
+
+    @GetMapping("/public/hello")
+    public GenericResponse<Map<String, String>> helloPublic() {
+        return GenericResponse.<Map<String, String>>builder()
+                .message("Hello, World!")
+                .data(null)
+                .success(true)
+                .build();
+    }
 }
