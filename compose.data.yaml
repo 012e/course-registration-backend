@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    container_name: db
+    environment:
+      - 'POSTGRES_PASSWORD=user'
+      - 'POSTGRES_USER=user'
+      - 'POSTGRES_DB=postgres'
+    ports:
+      - '5432:5432'
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"

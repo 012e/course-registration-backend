@@ -1,3 +1,6 @@
+include:
+  - compose.data.yaml
+
 services:
   app:
     build:
