@@ -1,12 +1,14 @@
 package com.u012e.session_auth_db.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "courses")
+@Data
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
