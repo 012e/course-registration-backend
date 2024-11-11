@@ -1,53 +1,18 @@
 import http from "k6/http";
 import { sleep, check } from "k6";
+import { randomIntBetween } from "https://jslib.k6.io/k6-utils/1.0.0/index.js";
 
 const url = "http://localhost:8080";
+const infinite = "1000000h"
 
 export const options = {
-  // A number specifying the number of VUs to run concurrently.
-  vus: 20,
-  // A string specifying the total duration of the test run.
-  duration: "60s",
-
-  // The following section contains configuration options for execution of this
-  // test script in Grafana Cloud.
-  //
-  // See https://grafana.com/docs/grafana-cloud/k6/get-started/run-cloud-tests-from-the-cli/
-  // to learn about authoring and running k6 test scripts in Grafana k6 Cloud.
-  //
-  // cloud: {
-  //   // The ID of the project to which the test is assigned in the k6 Cloud UI.
-  //   // By default tests are executed in default project.
-  //   projectID: "",
-  //   // The name of the test in the k6 Cloud UI.
-  //   // Test runs with the same name will be grouped.
-  //   name: "script.js"
-  // },
-
-  // Uncomment this section to enable the use of Browser API in your tests.
-  //
-  // See https://grafana.com/docs/k6/latest/using-k6-browser/running-browser-tests/ to learn more
-  // about using Browser API in your test scripts.
-  //
-  // scenarios: {
-  //   // The scenario name appears in the result summary, tags, and so on.
-  //   // You can give the scenario any name, as long as each name in the script is unique.
-  //   ui: {
-  //     // Executor is a mandatory parameter for browser-based tests.
-  //     // Shared iterations in this case tells k6 to reuse VUs to execute iterations.
-  //     //
-  //     // See https://grafana.com/docs/k6/latest/using-k6/scenarios/executors/ for other executor types.
-  //     executor: 'shared-iterations',
-  //     options: {
-  //       browser: {
-  //         // This is a mandatory parameter that instructs k6 to launch and
-  //         // connect to a chromium-based browser, and use it to run UI-based
-  //         // tests.
-  //         type: 'chromium',
-  //       },
-  //     },
-  //   },
-  // }
+  scenarios: {
+    testing: {
+      executor: 'externally-controlled',
+      duration: infinite,
+      maxVus: 1000,
+    },
+  },
 };
 
 function generateRandomString(minLength, maxLength) {
@@ -71,15 +36,15 @@ function generateRandomString(minLength, maxLength) {
   return result;
 }
 
-function randomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 const jsonParam = {
   headers: {
     "Content-Type": "application/json",
   },
 };
+
+function waitRandomly() {
+  sleep(randomIntBetween(1, 5));
+}
 
 export default function () {
   const username = generateRandomString(5, 10);
@@ -105,13 +70,15 @@ export default function () {
   check(registerResult, {
     "register response is 200": (r) => r.status === 200,
   });
+  waitRandomly();
 
   let loginResult = http.post(`${url}/auth/login`, loginData, jsonParam);
   check(loginResult, {
     "login response is 200": (r) => r.status === 200,
   });
+  waitRandomly();
 
-  const totalSecretRequests = randomNumber(1, 30);
+  const totalSecretRequests = randomIntBetween(1, 30);
   for (let i = 0; i < totalSecretRequests; i++) {
     let secretResult = http.get(`${url}/secret`);
     check(secretResult, {
@@ -120,5 +87,6 @@ export default function () {
         r.body ===
         JSON.stringify({ success: true, message: "Secret data", data: null }),
     });
+    waitRandomly();
   }
 }
