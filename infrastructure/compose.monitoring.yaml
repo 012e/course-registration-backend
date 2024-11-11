@@ -29,6 +29,16 @@ services:
       - DATA_SOURCE_URI=db:5432/postgres?sslmode=disable
       - DATA_SOURCE_USER=user
       - DATA_SOURCE_PASS=user
+    restart: unless-stopped
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    ports:
+      - '9121:9121'
+    container_name: redis-exporter
+    environment:
+      - REDIS_ADDR=redis:6379
+    restart: unless-stopped
 
 
 volumes:
