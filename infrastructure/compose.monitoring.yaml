@@ -20,6 +20,17 @@ services:
       - ./prometheus:/etc/prometheus
       - prometheus-storage:/prometheus
 
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    ports:
+      - '9187:9187'
+    container_name: postgres-exporter
+    environment:
+      - DATA_SOURCE_URI=db:5432/postgres?sslmode=disable
+      - DATA_SOURCE_USER=user
+      - DATA_SOURCE_PASS=user
+
+
 volumes:
   grafana-storage: {}
   prometheus-storage: {}
