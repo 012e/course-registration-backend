@@ -1,4 +1,24 @@
 services:
+  k6:
+    image: grafana/k6
+    container_name: k6
+    restart: unless-stopped
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://my-prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+      - K6_PROMETHEUS_RW_PUSH_INTERVAL=2s
+    command:
+      - run
+      - /etc/k6/benchmark-script.js
+      - --address
+      - 0.0.0.0:6565
+      - --out
+      - experimental-prometheus-rw
+    ports: 
+      - '6565:6565'
+    volumes:
+      - ./k6/:/etc/k6/
+
   grafana:
     image: grafana/grafana
     container_name: my-grafana
@@ -7,12 +27,15 @@ services:
       - '3000:3000'
     volumes:
       - grafana-storage:/var/lib/grafana
+      - ./grafana:/etc/grafana/
 
   prometheus:
     image: prom/prometheus
     container_name: my-prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=native-histograms
     ports:
       - '9090:9090'
     restart: unless-stopped
