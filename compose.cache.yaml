@@ -21,6 +21,9 @@ services:
       - '5432:5432'
     networks:
       - default-network
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
 
   redis:
     image: redis
