@@ -1,6 +1,7 @@
 package com.u012e.session_auth_db.controller;
 
 import com.u012e.session_auth_db.model.Course;
+import com.u012e.session_auth_db.model.Result;
 import com.u012e.session_auth_db.model.Student;
 import com.u012e.session_auth_db.model.Subject;
 import com.u012e.session_auth_db.service.seeder.Seeder;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("seed")
 @RequiredArgsConstructor
 public class SeedController {
-
     private final Seeder<Student> studentSeeder;
     private final Seeder<Subject> subjectSeeder;
     private final Seeder<Course> courseSeeder;
+    private final Seeder<Result> resultSeeder;
 
     @GetMapping("students")
     public GenericResponse<String> seedStudents(@RequestParam(defaultValue = "100") int count) {
@@ -32,6 +33,7 @@ public class SeedController {
                 .success(true)
                 .build();
     }
+
     @GetMapping("subjects")
     public GenericResponse<String> seedSubjects(@RequestParam(defaultValue = "100") int count){
         if (count < 0) {
@@ -44,6 +46,7 @@ public class SeedController {
                 .success(true)
                 .build();
     }
+
     @GetMapping("courses")
     public GenericResponse<String> seedCourses(@RequestParam(defaultValue = "50") int count){
         if (count < 0) {
@@ -52,6 +55,32 @@ public class SeedController {
         courseSeeder.seed(count);
         return GenericResponse.<String>builder()
                 .message("Courses seeded")
+                .data(null)
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("results")
+    public GenericResponse<String> seedResult(@RequestParam(defaultValue = "10") int count) {
+        if (count < 0) {
+            throw new IllegalArgumentException("Count must be greater than 0");
+        }
+        resultSeeder.seed(count);
+        return GenericResponse.<String>builder()
+                .message("Results seeded")
+                .data(null)
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("all")
+    public GenericResponse<String> seedAll() {
+        studentSeeder.seed(100);
+        subjectSeeder.seed(100);
+        courseSeeder.seed(50);
+        resultSeeder.seed(10);
+        return GenericResponse.<String>builder()
+                .message("Seeded database")
                 .data(null)
                 .success(true)
                 .build();
