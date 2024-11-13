@@ -5,6 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Random;
+
 @Configuration
 public class ProjectConfiguration {
     @Bean
@@ -15,5 +17,10 @@ public class ProjectConfiguration {
     @Bean
     Faker faker() {
         return new Faker();
+    }
+
+    @Bean
+    Random random() {
+        return new Random();
     }
 }
