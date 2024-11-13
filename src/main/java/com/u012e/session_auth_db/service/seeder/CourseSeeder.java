@@ -14,15 +14,15 @@ public class CourseSeeder implements Seeder<Course> {
     private final CourseRepository courseRepository;
     private final Faker faker;
     private final List<Course> courseList;
+
     @Override
     public void seed(int count) {
-        for (int i = 0; i < count; ++i){
+        for (int i = 0; i < count; ++i) {
             Course course = new Course();
             int shift = faker.number().numberBetween(1, 2);
-            if (shift == 1){
+            if (shift == 1) {
                 course.setStartPeriod(faker.number().numberBetween(1, 2));
-            }
-            else{
+            } else {
                 course.setStartPeriod(faker.number().numberBetween(6, 7));
             }
             course.setEndPeriod(course.getStartPeriod() + 3);
