@@ -65,6 +65,7 @@ public class DependencyService {
         try {
             dependencyRepository.saveAll(dependencies);
         } catch (DataIntegrityViolationException ignore) {
+            // TODO: just a workaround, it just ignores all exceptions
         }
     }
 }
