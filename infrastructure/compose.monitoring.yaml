@@ -63,7 +63,16 @@ services:
       - REDIS_ADDR=redis:6379
     restart: unless-stopped
 
-
+  dex:
+    image: spx01/dex
+    container_name: dex
+    environment:
+      DEX_PORT: 3456
+    volumes:
+      - /run/user/1000/docker.sock:/var/run/docker.sock
+    ports:
+      - '3456:3456'
+    restart: always
 volumes:
   grafana-storage: {}
   prometheus-storage: {}
