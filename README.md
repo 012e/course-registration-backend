@@ -5,6 +5,10 @@
 - Docker (phiên bản mới mới một xíu)
 - Python >=3.10
 
+## Architecture
+
+![main.d2](https://github.com/user-attachments/assets/a8634292-ddb4-4439-92be-1d58c6d46211)
+
 ## Chạy
 
 ### Không có cache
