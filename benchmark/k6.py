@@ -79,7 +79,7 @@ class K6Controller:
         self.update_status(paused=False)
 
     def stop(self) -> None:
-        log.debug("stoppping")
+        log.debug("stopping")
         self.update_status(stopped=True)
 
     def scale(self, vus: int) -> None:
