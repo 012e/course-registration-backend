@@ -6,7 +6,7 @@ services:
     environment:
       - K6_PROMETHEUS_RW_SERVER_URL=http://my-prometheus:9090/api/v1/write
       - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
-      - K6_PROMETHEUS_RW_PUSH_INTERVAL=2s
+      - K6_PROMETHEUS_RW_PUSH_INTERVAL=1s
     command:
       - run
       - /etc/k6/benchmark-script.js
@@ -14,10 +14,11 @@ services:
       - 0.0.0.0:6565
       - --out
       - experimental-prometheus-rw
-    ports: 
+    ports:
       - '6565:6565'
     volumes:
       - ./k6/:/etc/k6/
+    profiles: [ "test" ]
 
   grafana:
     image: grafana/grafana
@@ -28,6 +29,7 @@ services:
     volumes:
       - grafana-storage:/var/lib/grafana
       - ./grafana:/etc/grafana/
+    profiles: [ "test" ]
 
   prometheus:
     image: prom/prometheus
@@ -42,6 +44,7 @@ services:
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus-storage:/prometheus
+    profiles: [ "test" ]
 
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
@@ -53,6 +56,8 @@ services:
       - DATA_SOURCE_USER=user
       - DATA_SOURCE_PASS=user
     restart: unless-stopped
+    profiles: [ "test" ]
+
 
   redis-exporter:
     image: oliver006/redis_exporter
@@ -62,6 +67,7 @@ services:
     environment:
       - REDIS_ADDR=redis:6379
     restart: unless-stopped
+    profiles: [ "test" ]
 
   dex:
     image: spx01/dex
@@ -73,6 +79,8 @@ services:
     ports:
       - '3456:3456'
     restart: always
+    profiles: [ "test" ]
+
 volumes:
-  grafana-storage: {}
-  prometheus-storage: {}
+  grafana-storage: { }
+  prometheus-storage: { }

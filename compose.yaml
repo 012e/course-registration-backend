@@ -1,0 +1,36 @@
+include:
+  - ./infrastructure/compose.data.yaml
+  - ./infrastructure/compose.monitoring.yaml
+
+services:
+  app-db:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: app
+    command: --spring.profiles.active=database
+    ports:
+      - '8080:8080'
+    profiles:  [ "database" ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 20s
+
+  app-cache:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: app
+    command: --spring.profiles.active=cache
+    ports:
+      - '8080:8080'
+    profiles: [ "cache" ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 20s
