@@ -24,10 +24,15 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      - SPRING_PORT=${SPRING_PORT:-8083}
     ports:
       - "8080:8080"
     volumes:
-      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+    depends_on:
+      - app
     networks:
       - load-balancer
 
