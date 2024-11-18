@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Result {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(optional = false)

@@ -1,9 +1,6 @@
 package com.u012e.session_auth_db.controller;
 
-import com.u012e.session_auth_db.model.Course;
-import com.u012e.session_auth_db.model.Result;
-import com.u012e.session_auth_db.model.Student;
-import com.u012e.session_auth_db.model.Subject;
+import com.u012e.session_auth_db.model.*;
 import com.u012e.session_auth_db.service.seeder.Seeder;
 import com.u012e.session_auth_db.utils.GenericResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +17,7 @@ public class SeedController {
     private final Seeder<Subject> subjectSeeder;
     private final Seeder<Course> courseSeeder;
     private final Seeder<Result> resultSeeder;
+    private final Seeder<Dependency> dependencySeeder;
 
     @GetMapping("students")
     public GenericResponse<String> seedStudents(@RequestParam(defaultValue = "100") int count) {
@@ -35,7 +33,7 @@ public class SeedController {
     }
 
     @GetMapping("subjects")
-    public GenericResponse<String> seedSubjects(@RequestParam(defaultValue = "100") int count){
+    public GenericResponse<String> seedSubjects(@RequestParam(defaultValue = "100") int count) {
         if (count < 0) {
             throw new IllegalArgumentException("Count must be greater than 0");
         }
@@ -48,7 +46,7 @@ public class SeedController {
     }
 
     @GetMapping("courses")
-    public GenericResponse<String> seedCourses(@RequestParam(defaultValue = "50") int count){
+    public GenericResponse<String> seedCourses(@RequestParam(defaultValue = "50") int count) {
         if (count < 0) {
             throw new IllegalArgumentException("Count must be greater than 0");
         }
@@ -73,12 +71,24 @@ public class SeedController {
                 .build();
     }
 
+    @GetMapping("dependencies")
+    public GenericResponse<String> seedResult() {
+        dependencySeeder.seed(0);
+        return GenericResponse.<String>builder()
+                .message("Dependencies seeded")
+                .data(null)
+                .success(true)
+                .build();
+    }
+
+
     @GetMapping("all")
     public GenericResponse<String> seedAll() {
-        studentSeeder.seed(100);
-        subjectSeeder.seed(100);
-        courseSeeder.seed(50);
+        studentSeeder.seed(200);
+        subjectSeeder.seed(50);
+        courseSeeder.seed(200);
         resultSeeder.seed(10);
+        dependencySeeder.seed(0);
         return GenericResponse.<String>builder()
                 .message("Seeded database")
                 .data(null)

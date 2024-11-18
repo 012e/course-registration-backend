@@ -46,7 +46,8 @@ public class ResultSeeder implements Seeder<Result> {
         // WARN: possible missing courses
         courseCount = courseRepository.count();
 
-        for (Student student : studentRepository.findAll()) {
+        var students = studentRepository.findAll();
+        for (Student student : students) {
             var randomCourses = getRandomCourses(faker.number().numberBetween(1, count));
             for (Course course : randomCourses) {
                 results.add(Result.builder()
