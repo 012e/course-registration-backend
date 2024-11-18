@@ -24,6 +24,9 @@ class StatusResponse(TypedDict):
     data: Data
 
 
+JSON_HEADERS = {"Content-Type": "application/json"}
+
+
 class K6Controller:
     address: str
 
@@ -31,43 +34,29 @@ class K6Controller:
         self.address = address
 
     def get_status(self) -> StatusResponse:
-        headers = {
-            "Content-Type": "application/json",
-        }
-
-        response = requests.get(f"{self.address}/v1/status", headers=headers)
+        response = requests.get(f"{self.address}/v1/status", headers=JSON_HEADERS)
 
         return response.json()
 
     def update_status(
         self, vus: int | None = None, stopped: bool | None = None, **kwargs
     ) -> None:
-        headers = {
-            "Content-Type": "application/json",
-        }
-
         body = {"data": {"attributes": {"vus": vus, "stopped": stopped, **kwargs}}}
         body = {k: v for k, v in body.items() if v is not None}
 
         response = requests.patch(
-            f"{self.address}/v1/status", headers=headers, json=body
+            f"{self.address}/v1/status", headers=JSON_HEADERS, json=body
         )
 
         if response.status_code != 200:
             raise Exception("Failed to update status")
 
     def list_metrics(self):
-        headers = {
-            "Content-Type": "application/json",
-        }
-        response = requests.get(f"{self.address}/v1/metrics", headers=headers)
+        response = requests.get(f"{self.address}/v1/metrics", headers=JSON_HEADERS)
         return response.json()
 
     def get_metrics(self, id: str):
-        headers = {
-            "Content-Type": "application/json",
-        }
-        response = requests.get(f"{self.address}/v1/metrics/{id}", headers=headers)
+        response = requests.get(f"{self.address}/v1/metrics/{id}", headers=JSON_HEADERS)
         return response.json()
 
     def pause(self) -> None:
