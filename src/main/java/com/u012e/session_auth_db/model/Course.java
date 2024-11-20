@@ -1,7 +1,10 @@
 package com.u012e.session_auth_db.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,6 +12,9 @@ import java.util.Set;
 @Entity
 @Table(name = "courses")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

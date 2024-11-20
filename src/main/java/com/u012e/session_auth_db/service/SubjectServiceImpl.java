@@ -1,6 +1,7 @@
 package com.u012e.session_auth_db.service;
 
-import com.u012e.session_auth_db.dto.SubjectDto;
+import com.u012e.session_auth_db.dto.CreateSubjectDto;
+import com.u012e.session_auth_db.dto.ResponseSubjectDto;
 import com.u012e.session_auth_db.model.Subject;
 import com.u012e.session_auth_db.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ public class SubjectServiceImpl implements SubjectService {
     private final SubjectRepository subjectRepository;
 
     @Override
-    public long createSubject(SubjectDto subjectDto) {
+    public long createSubject(CreateSubjectDto subjectDto) {
         var subject = Subject.builder()
                 .name(subjectDto.getName())
                 .build();
@@ -24,7 +25,7 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public long updateSubject(long id, SubjectDto subjectDto) {
+    public long updateSubject(long id, CreateSubjectDto subjectDto) {
         var subject = subjectRepository.findById(id);
 
         if (subject.isEmpty()) {
@@ -49,12 +50,15 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public SubjectDto getSubject(long id) {
+    public ResponseSubjectDto getSubject(long id) {
         var subject = subjectRepository.findById(id);
         if (subject.isEmpty()) {
             throw new IllegalArgumentException("Subject not found");
         }
 
-        return SubjectDto.builder().name(subject.get().getName()).build();
+        return ResponseSubjectDto.builder()
+                .name(subject.get().getName())
+                .id(subject.get().getId())
+                .build();
     }
 }

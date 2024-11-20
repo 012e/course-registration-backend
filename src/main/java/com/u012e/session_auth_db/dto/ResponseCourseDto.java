@@ -9,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubjectDto {
-    private String name;
+public class ResponseCourseDto {
+    private Integer startPeriod;
+    private Integer endPeriod;
+    private Integer dayOfWeek;
+    private Integer maxParticipants;
+    private ResponseSubjectDto subject;
 }
-
