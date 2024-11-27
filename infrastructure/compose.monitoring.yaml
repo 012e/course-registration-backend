@@ -19,6 +19,8 @@ services:
     volumes:
       - ./k6/:/etc/k6/
     profiles: [ "test" ]
+    networks:
+      - backend
 
   grafana:
     image: grafana/grafana
@@ -30,6 +32,8 @@ services:
       - grafana-storage:/var/lib/grafana
       - ./grafana:/etc/grafana/
     profiles: [ "test" ]
+    networks:
+      - backend
 
   prometheus:
     image: prom/prometheus
@@ -45,6 +49,8 @@ services:
       - ./prometheus:/etc/prometheus
       - prometheus-storage:/prometheus
     profiles: [ "test" ]
+    networks:
+      - backend
 
   postgres-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter
@@ -57,6 +63,8 @@ services:
       - DATA_SOURCE_PASS=user
     restart: unless-stopped
     profiles: [ "test" ]
+    networks:
+      - backend
 
 
   redis-exporter:
@@ -68,6 +76,8 @@ services:
       - REDIS_ADDR=redis:6379
     restart: unless-stopped
     profiles: [ "test" ]
+    networks:
+      - backend
 
   dex:
     image: spx01/dex
@@ -80,6 +90,9 @@ services:
       - '3456:3456'
     restart: always
     profiles: [ "test" ]
+    networks:
+      - backend
+
 
 volumes:
   grafana-storage: { }

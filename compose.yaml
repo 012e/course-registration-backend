@@ -3,15 +3,17 @@ include:
   - ./infrastructure/compose.monitoring.yaml
 
 services:
-  app-db:
+  app:
     build:
       context: .
       dockerfile: ./Dockerfile
-    container_name: app
-    command: --spring.profiles.active=database
-    ports:
-      - '8080:8080'
-    profiles:  [ "database" ]
+    command:
+      - --spring.profiles.active=${SPRING_PROFILE:-database}
+      - --server.port=${SPRING_PORT:-8083}
+    networks:
+      - load-balancer
+      - backend
+    scale: ${SPRING_REPLICAS:-1}
     deploy:
       restart_policy:
         condition: on-failure
@@ -19,18 +21,21 @@ services:
         max_attempts: 3
         window: 20s
 
-  app-cache:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    container_name: app
-    command: --spring.profiles.active=cache
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      - SPRING_PORT=${SPRING_PORT:-8083}
     ports:
-      - '8080:8080'
-    profiles: [ "cache" ]
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
-        window: 20s
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+    depends_on:
+      - app
+    networks:
+      - load-balancer
+
+networks:
+  load-balancer: { }
+  backend: { }
