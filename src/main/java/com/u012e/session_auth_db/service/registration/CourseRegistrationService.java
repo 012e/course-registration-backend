@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CourseRegistrationService {
     RegistrationResult register(Student student, List<Long> courseIds);
+
+    RegistrationResult unregister(Student student, List<Long> courseIds);
 }

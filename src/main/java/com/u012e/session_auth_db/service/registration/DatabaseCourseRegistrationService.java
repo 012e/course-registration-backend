@@ -74,6 +74,28 @@ public class DatabaseCourseRegistrationService implements CourseRegistrationServ
                 .build();
     }
 
+    @Override
+    public RegistrationResult unregister(Student student, List<Long> courseIds) {
+        var courses = getCoursesById(courseIds);
+        var oldCourses = student.getCourses();
+        var failed = new HashSet<Course>();
+        var succeed = new HashSet<Course>();
+        for (var course : courses) {
+            if (oldCourses.remove(course)) {
+                participantCounterService.freeSlot(course);
+                succeed.add(course);
+            } else {
+                failed.add(course);
+            }
+        }
+        student.setCourses(oldCourses);
+        studentRepository.save(student);
+        return RegistrationResult.builder()
+                .failed(failed)
+                .succeed(succeed)
+                .build();
+    }
+
     private RegistrationResult registerOnFreeSlots(Set<Course> courses) {
         var ok = new HashSet<Course>();
         var failed = new HashSet<Course>();
