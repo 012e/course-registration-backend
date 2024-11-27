@@ -33,6 +33,9 @@ public class Course {
     @Column(nullable = false)
     private int maxParticipants;
 
+    @Column(nullable = false)
+    private int participantsCount;
+
     @ManyToOne(optional = false)
     private Subject subject;
 
