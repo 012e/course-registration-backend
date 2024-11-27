@@ -2,6 +2,7 @@ package com.u012e.session_auth_db.configuration;
 
 import com.u012e.session_auth_db.exception.InvalidCredentialsException;
 import com.u012e.session_auth_db.utils.GenericResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(InvalidCredentialsException.class)
@@ -53,6 +55,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<GenericResponse<HashMap<String, String>>> handleInvalidState(Exception exception) {
+        log.error("Unhandled exception", exception);
         var body = GenericResponse.<HashMap<String, String>>builder()
                 .message(exception.getMessage())
                 .success(false)
@@ -63,6 +66,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GenericResponse<HashMap<String, String>>> handleAnyException(Exception exception) {
+        log.error("Unhandled exception", exception);
         var body = GenericResponse.<HashMap<String, String>>builder()
                 .message(exception.getMessage())
                 .success(false)

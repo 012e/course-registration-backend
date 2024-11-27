@@ -25,7 +25,7 @@ public class DatabaseCourseRegistrationService implements CourseRegistrationServ
     private final ParticipantCounterService participantCounterService;
 
     @SafeVarargs
-    public static <T> Set<T> flatten(Set<T>... sets) {
+    public static <T> Set<T> union(Set<T>... sets) {
         Set<T> flattenedSet = new HashSet<>();
         for (Set<T> set : sets) {
             flattenedSet.addAll(set);
@@ -34,13 +34,12 @@ public class DatabaseCourseRegistrationService implements CourseRegistrationServ
     }
 
     private static Set<Subject> getLearnedSubjects(Student student) {
-        var learnedSubjects = student
+        return student
                 .getResults()
                 .parallelStream()
                 .map(result -> result.getCourse()
                         .getSubject())
                 .collect(Collectors.toSet());
-        return learnedSubjects;
     }
 
     @Override
@@ -48,21 +47,26 @@ public class DatabaseCourseRegistrationService implements CourseRegistrationServ
         var courses = getCoursesById(courseIds);
         var learnedSubjects = getLearnedSubjects(student);
 
-        log.trace("Checking dependencies for student {} and courses {}", student, courses);
-
         // Check dependencies
+        log.trace("Checking dependencies for student {} and courses {}", student, courses);
         var dependencyCheckResult = dependencyChecker.checkDependencies(courses, learnedSubjects);
+
+        // Check for free slots
+        log.trace("Checking for free slots for student {} and courses {}", student, courses);
         var freeSlotResult = registerOnFreeSlots(dependencyCheckResult.getSucceed());
 
         // Collect failed and accepted courses
-        var failedCourses = flatten(dependencyCheckResult.getFailed(), freeSlotResult.getFailed());
+        var failedCourses = union(dependencyCheckResult.getFailed(), freeSlotResult.getFailed());
         var acceptedCourses = freeSlotResult.getSucceed();
+        log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
         // Finally save
-        student
-                .getCourses()
-                .addAll(acceptedCourses);
+        log.trace("Saving student registration to database {}", student);
+        var oldCourses = student.getCourses();
+        oldCourses.addAll(acceptedCourses);
+        student.setCourses(oldCourses);
         studentRepository.save(student);
+        log.trace("Saved student registration to database {}", student);
 
         return RegistrationResult.builder()
                 .failed(failedCourses)

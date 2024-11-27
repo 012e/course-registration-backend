@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Table(name = "results",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"student_id", "course_id"})
@@ -28,4 +30,26 @@ public class Result {
 
     @Column(nullable = false)
     private Boolean passed;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Result result = (Result) o;
+        return Objects.equals(id, result.id) && Objects.equals(student, result.student) && Objects.equals(course, result.course) && Objects.equals(passed, result.passed);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, student, course, passed);
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "id=" + id +
+                ", student=" + student +
+                ", course=" + course +
+                ", passed=" + passed +
+                '}';
+    }
 }
