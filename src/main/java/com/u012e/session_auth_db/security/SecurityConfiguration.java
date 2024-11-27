@@ -29,6 +29,7 @@ public class SecurityConfiguration {
     }
 
     private static String[] whiteList = {
+            "/auth/forceLogin",
             "/auth/login",
             "/auth/register",
             "/auth/logout",

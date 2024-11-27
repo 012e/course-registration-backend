@@ -3,6 +3,7 @@ package com.u012e.session_auth_db.controller;
 import com.u012e.session_auth_db.dto.LoginDto;
 import com.u012e.session_auth_db.dto.RegisterDto;
 import com.u012e.session_auth_db.service.AuthenticationService;
+import com.u012e.session_auth_db.service.StudentService;
 import com.u012e.session_auth_db.utils.GenericResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.util.Map;
 @Slf4j
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final StudentService studentService;
 
     @PostMapping("/login")
     public GenericResponse<Map<String, String>> login(
@@ -45,6 +47,32 @@ public class AuthenticationController {
         return GenericResponse.<Map<String, String>>builder()
                 .success(true)
                 .message("registered successfully")
+                .build();
+    }
+
+    @Operation(summary = "forceLogin", description = "WARNING: Testing only! This endpoint will login the first user in the database")
+    @PostMapping("/forceLogin")
+    public GenericResponse<Map<String, String>> forceLogin(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        var randomUser = studentService.getStudentById(1L);
+        if (randomUser.isEmpty()) {
+            return GenericResponse.<Map<String, String>>builder()
+                    .success(false)
+                    .message("There is no user in the database, please seed the database first")
+                    .build();
+        }
+        var loginDto = LoginDto.builder()
+                .username(randomUser.get().getUsername())
+                .password("password")
+                .build();
+        log.trace("logging in user");
+        authenticationService.login(loginDto, request, response);
+        log.trace("user is logged in");
+        return GenericResponse.<Map<String, String>>builder()
+                .success(true)
+                .message("login successfully")
                 .build();
     }
 
