@@ -49,4 +49,25 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<GenericResponse<HashMap<String, String>>> handleInvalidState(Exception exception) {
+        var body = GenericResponse.<HashMap<String, String>>builder()
+                .message(exception.getMessage())
+                .success(false)
+                .build();
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<GenericResponse<HashMap<String, String>>> handleAnyException(Exception exception) {
+        var body = GenericResponse.<HashMap<String, String>>builder()
+                .message(exception.getMessage())
+                .success(false)
+                .build();
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
