@@ -34,7 +34,8 @@ public class CourseServiceImpl implements CourseService {
 
         var course = modelMapper.map(courseDto, Course.class);
 
-        return courseRepository.save(course).getId();
+        return courseRepository.save(course)
+                .getId();
     }
 
     @Override
@@ -65,28 +66,33 @@ public class CourseServiceImpl implements CourseService {
         if (subject.isEmpty()) {
             throw new IllegalArgumentException("Subject not found");
         }
-        course.get().setSubject(subject.get());
+        course.get()
+                .setSubject(subject.get());
 
         if (courseDto.getMaxParticipants() > 0) {
-            course.get().setMaxParticipants(courseDto.getMaxParticipants());
+            course.get()
+                    .setMaxParticipants(courseDto.getMaxParticipants());
         } else {
             throw new IllegalArgumentException("Max participants must be greater than zero");
         }
 
         if (courseDto.getStartPeriod() > 0) {
-            course.get().setStartPeriod(courseDto.getStartPeriod());
+            course.get()
+                    .setStartPeriod(courseDto.getStartPeriod());
         } else {
             throw new IllegalArgumentException("Start period must be greater than zero");
         }
 
         if (courseDto.getEndPeriod() > courseDto.getStartPeriod()) {
-            course.get().setEndPeriod(courseDto.getEndPeriod());
+            course.get()
+                    .setEndPeriod(courseDto.getEndPeriod());
         } else {
             throw new IllegalArgumentException("End period must be less than start period");
         }
 
         if (courseDto.getDayOfWeek() > 0) {
-            course.get().setDayOfWeek(courseDto.getDayOfWeek());
+            course.get()
+                    .setDayOfWeek(courseDto.getDayOfWeek());
         } else {
             throw new IllegalArgumentException("DayOfWeek must be greater than zero");
         }
@@ -96,7 +102,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getAllById(List<Long> ids) {
-        return courseRepository.findAllById(ids);
+        var courses = courseRepository.findAllById(ids);
+        if (courses.size() != ids.size()) {
+            throw new IllegalArgumentException("Some courses not found");
+        }
+        return courses;
     }
 
     @Override

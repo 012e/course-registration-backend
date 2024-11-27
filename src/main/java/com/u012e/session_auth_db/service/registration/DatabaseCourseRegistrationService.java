@@ -93,8 +93,7 @@ public class DatabaseCourseRegistrationService implements CourseRegistrationServ
     }
 
     private HashSet<Course> getCoursesById(List<Long> courseIds) {
-        var courses = new HashSet<>(courseService.getAllById(courseIds));
-        return courses;
+        return new HashSet<>(courseService.getAllById(courseIds));
     }
 }
 
