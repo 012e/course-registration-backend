@@ -28,5 +28,4 @@ public class Result {
 
     @Column(nullable = false)
     private Boolean passed;
-
 }

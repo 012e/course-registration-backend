@@ -19,12 +19,9 @@ public class Dependency {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "subject_id", nullable = false)
-    private Subject subject;
+    @Column(name = "subject_id", nullable = false)
+    private Long subjectId;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "required_subject_id", nullable = false)
-    private Subject requiredSubject;
-
+    @Column(name = "required_subject_id", nullable = false)
+    private Long requiredSubjectId;
 }
