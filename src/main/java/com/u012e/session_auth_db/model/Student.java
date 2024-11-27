@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "students", indexes = @Index(columnList = "username"))
@@ -41,6 +38,26 @@ public class Student implements UserDetails {
     @NotNull
     @Column(unique = true, nullable = false)
     private String username;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Student student = (Student) o;
+        return id == student.id && Objects.equals(firstName, student.firstName) && Objects.equals(lastName, student.lastName) && Objects.equals(password, student.password) && Objects.equals(username, student.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, firstName, lastName, password, username);
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
+    }
 
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
