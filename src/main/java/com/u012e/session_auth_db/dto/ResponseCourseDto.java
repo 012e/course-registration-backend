@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseCourseDto {
+    private Long id;
     private Integer startPeriod;
     private Integer endPeriod;
     private Integer dayOfWeek;

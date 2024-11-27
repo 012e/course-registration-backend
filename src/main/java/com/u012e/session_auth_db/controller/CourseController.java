@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/course")
@@ -34,8 +36,19 @@ public class CourseController {
         return GenericResponse.success();
     }
 
-    @GetMapping("/")
-    public GenericResponse<ResponseCourseDto> get(@Parameter Long id) {
+    @GetMapping("/{id}")
+    public GenericResponse<ResponseCourseDto> getById(@PathVariable("id") Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id must not be null");
+        }
+        if (id < 0) {
+            throw new IllegalArgumentException("Id must be greater than 0");
+        }
         return GenericResponse.success(courseService.getCourse(id));
+    }
+
+    @GetMapping("/")
+    public GenericResponse<List<ResponseCourseDto>> get() {
+        return GenericResponse.success(courseService.getAll());
     }
 }

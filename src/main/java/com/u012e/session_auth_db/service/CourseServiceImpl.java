@@ -2,13 +2,15 @@ package com.u012e.session_auth_db.service;
 
 import com.u012e.session_auth_db.dto.CreateCourseDto;
 import com.u012e.session_auth_db.dto.ResponseCourseDto;
-import com.u012e.session_auth_db.dto.ResponseSubjectDto;
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final SubjectRepository subjectRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public long createCourse(CreateCourseDto courseDto) {
@@ -29,13 +32,7 @@ public class CourseServiceImpl implements CourseService {
             throw new IllegalArgumentException("Start period must be less than end period");
         }
 
-        var course = Course.builder()
-                .dayOfWeek(courseDto.getDayOfWeek())
-                .maxParticipants(courseDto.getMaxParticipants())
-                .startPeriod(courseDto.getStartPeriod())
-                .endPeriod(courseDto.getEndPeriod())
-                .subject(subject.get())
-                .build();
+        var course = modelMapper.map(courseDto, Course.class);
 
         return courseRepository.save(course).getId();
     }
@@ -48,17 +45,7 @@ public class CourseServiceImpl implements CourseService {
             throw new IllegalArgumentException("Course not found");
         }
 
-        return ResponseCourseDto.builder()
-                .dayOfWeek(course.get().getDayOfWeek())
-                .maxParticipants(course.get().getMaxParticipants())
-                .startPeriod(course.get().getStartPeriod())
-                .endPeriod(course.get().getEndPeriod())
-                .subject(
-                        ResponseSubjectDto.builder()
-                                .name(course.get().getSubject().getName())
-                                .id(course.get().getSubject().getId())
-                                .build())
-                .build();
+        return modelMapper.map(course.get(), ResponseCourseDto.class);
     }
 
     @Override
@@ -105,5 +92,19 @@ public class CourseServiceImpl implements CourseService {
         }
 
         courseRepository.save(course.get());
+    }
+
+    @Override
+    public List<Course> getAllById(List<Long> ids) {
+        return courseRepository.findAllById(ids);
+    }
+
+    @Override
+    public List<ResponseCourseDto> getAll() {
+        return courseRepository
+                .findAll()
+                .stream()
+                .map(course -> modelMapper.map(course, ResponseCourseDto.class))
+                .toList();
     }
 }
