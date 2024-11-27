@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +35,8 @@ public class DependencyService {
         var dependencies = new ArrayList<Dependency>(requiredSubjects.size());
         for (var required : requiredSubjects) {
             var dependency = new Dependency();
-            dependency.setSubject(subject);
-            dependency.setRequiredSubject(required);
+            dependency.setSubjectId(subject.getId());
+            dependency.setRequiredSubjectId(required.getId());
             dependencies.add(dependency);
         }
         try {
@@ -58,8 +60,8 @@ public class DependencyService {
         var dependencies = new ArrayList<Dependency>(requiredSubjects.size());
         for (var required : requiredSubjects) {
             var dependency = new Dependency();
-            dependency.setSubject(subject);
-            dependency.setRequiredSubject(required);
+            dependency.setSubjectId(subject.getId());
+            dependency.setRequiredSubjectId(required.getId());
             dependencies.add(dependency);
         }
         try {
@@ -67,5 +69,16 @@ public class DependencyService {
         } catch (DataIntegrityViolationException ignore) {
             // TODO: just a workaround, it just ignores all exceptions
         }
+    }
+
+    public Set<Subject> getDependencies(Subject subject) {
+        return dependencyRepository
+                .findAllBySubjectId(subject.getId())
+                .stream()
+                .map(dep -> subjectRepository
+                        .findById(dep.getRequiredSubjectId())
+                        .orElseThrow(() -> new IllegalArgumentException("Subject not found"))
+                )
+                .collect(Collectors.toSet());
     }
 }

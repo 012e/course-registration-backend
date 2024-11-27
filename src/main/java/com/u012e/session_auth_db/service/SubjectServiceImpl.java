@@ -45,7 +45,7 @@ public class SubjectServiceImpl implements SubjectService {
         if (subject.isEmpty()) {
             throw new IllegalArgumentException("Subject not found");
         }
-        
+
         subjectRepository.deleteById(id);
     }
 

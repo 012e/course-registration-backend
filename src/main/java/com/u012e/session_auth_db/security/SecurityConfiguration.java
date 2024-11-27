@@ -1,6 +1,5 @@
 package com.u012e.session_auth_db.security;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +29,6 @@ public class SecurityConfiguration {
     }
 
     private static String[] whiteList = {
-            "/**",
             "/auth/login",
             "/auth/register",
             "/auth/logout",
