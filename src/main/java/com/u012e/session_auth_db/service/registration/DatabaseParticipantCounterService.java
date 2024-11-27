@@ -25,7 +25,7 @@ public class DatabaseParticipantCounterService implements ParticipantCounterServ
 
     @Override
     @Transactional
-    public void giveUpSlot(Course course) {
+    public void freeSlot(Course course) {
         var count = course.getParticipantsCount();
         if (count == 0) {
             throw new IllegalStateException("Trying to give up slot on empty course");
