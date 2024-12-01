@@ -26,6 +26,21 @@ class StatusResponse(TypedDict):
 
 JSON_HEADERS = {"Content-Type": "application/json"}
 
+def delete_none(_dict):
+    """Delete None values recursively from all of the dictionaries"""
+    for key, value in list(_dict.items()):
+        if isinstance(value, dict):
+            delete_none(value)
+        elif value is None:
+            del _dict[key]
+        elif isinstance(value, list):
+            for v_i in value:
+                if isinstance(v_i, dict):
+                    delete_none(v_i)
+
+    return _dict
+
+
 
 class K6Controller:
     address: str
@@ -41,8 +56,14 @@ class K6Controller:
     def update_status(
         self, vus: int | None = None, stopped: bool | None = None, **kwargs
     ) -> None:
-        body = {"data": {"attributes": {"vus": vus, "stopped": stopped, **kwargs}}}
-        body = {k: v for k, v in body.items() if v is not None}
+        body = {
+            "data": {
+                "type": "status",
+                "id": "default",
+                "attributes": {"vus": vus, "stopped": stopped, **kwargs},
+            }
+        }
+        body = delete_none(body)
 
         response = requests.patch(
             f"{self.address}/v1/status", headers=JSON_HEADERS, json=body
