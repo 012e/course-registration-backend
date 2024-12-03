@@ -5,6 +5,7 @@ import com.u012e.session_auth_db.model.Subject;
 import com.u012e.session_auth_db.service.DependencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -37,6 +38,7 @@ public class DependencyExtractor {
         return result;
     }
 
+    @Cacheable("dependencyExtractor")
     public Set<Subject> getDependantSubjectsRecursively(Course course) {
         log.trace("Extracting dependencies for course {}", course);
         var subject = course.getSubject();
