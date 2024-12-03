@@ -1,0 +1,89 @@
+name: Benchmark
+
+on:
+  pull_request: {}
+
+env:
+  BENCHMARK_DURATION: 20s
+
+jobs:
+  benchmark:
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        profile: [cache, database]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install python dependencies
+        run: pip install requests
+
+      - name: Setup docker compose
+        uses: KengoTODA/actions-setup-docker-compose@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and run stack
+        run: docker compose --profile ${{ matrix.profile }} --profile test up --build -d
+
+      - name: Wait stack startup
+        run: |
+          curl \
+            --retry-all-errors \
+            --retry 5 \
+            --connect-timeout 1 \
+            --retry-delay 3 \
+            localhost:8080/public/hello
+
+      - name: Seed data
+        run: |
+          curl -X 'GET' \
+            'http://localhost:8080/seed/all' \
+            -H 'accept: application/json'
+
+      - name: Prepare cache 
+        run: |
+          curl -X 'GET' \
+            'http://localhost:8080/cache/prepareCourses' \
+            -H 'accept: application/json'
+
+      - name: Run benchmark
+        id: benchmark
+        uses: mathiasvr/command-output@v2.0.0
+        with:
+          run: python benchmark/benchmark.py --duration="$BENCHMARK_DURATION"
+
+      - name: Output benchmark
+        uses: actions/github-script@v7
+        env:
+          OUTPUT: ${{ steps.benchmark.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let { OUTPUT } = process.env;
+            OUTPUT = OUTPUT.trim();
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `
+              # Run number ${context.runNumber}
+              ## ${{ matrix.profile }} benchmark result:
+              \`\`\`
+              ${OUTPUT}
+              \`\`\``
+            });
+
+      - name: Clean up stack
+        run: docker compose --profile ${{ matrix.profile }} --profile test down
