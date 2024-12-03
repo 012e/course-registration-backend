@@ -10,7 +10,7 @@ from time import sleep
 from k6 import K6Controller
 from utils import parse_duration
 
-log.basicConfig(stream=sys.stdout, level=log.DEBUG)
+log.basicConfig(stream=sys.stderr, level=log.DEBUG)
 
 controller = K6Controller()
 
