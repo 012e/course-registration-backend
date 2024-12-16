@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 @Data
-public class Dependency {
+public class Dependency implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

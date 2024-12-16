@@ -4,9 +4,11 @@ import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.repository.CourseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("database")
 @RequiredArgsConstructor
 public class DatabaseParticipantCounterService implements ParticipantCounterService {
     private final CourseRepository courseRepository;
