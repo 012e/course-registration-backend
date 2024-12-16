@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,11 @@ public class StudentSeeder implements Seeder<Student> {
             var student = Student
                     .builder()
                     .firstName(faker.name().firstName())
-                    .lastName(faker.name().lastName())
-                    .username(faker.internet().username())
+                    .lastName(faker.name()
+                            .lastName())
+                    .username(UUID.randomUUID()
+                            .toString()
+                            .replaceAll("-", ""))
                     .password(passwordEncoder.encode(DEFAULT_PASSWORD))
                     .build();
             students.add(student);
