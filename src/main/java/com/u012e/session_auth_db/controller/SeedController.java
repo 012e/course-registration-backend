@@ -82,12 +82,26 @@ public class SeedController {
     }
 
 
-    @GetMapping("all")
-    public GenericResponse<String> seedAll() {
+    @GetMapping("all/heavy")
+    public GenericResponse<String> seedAllHeavy() {
         studentSeeder.seed(10000);
         subjectSeeder.seed(2000);
         courseSeeder.seed(1000);
         resultSeeder.seed(100);
+        dependencySeeder.seed(0);
+        return GenericResponse.<String>builder()
+                .message("Seeded database")
+                .data(null)
+                .success(true)
+                .build();
+    }
+
+    @GetMapping("all/light")
+    public GenericResponse<String> seedAllLight() {
+        studentSeeder.seed(1000);
+        subjectSeeder.seed(100);
+        courseSeeder.seed(350);
+        resultSeeder.seed(30);
         dependencySeeder.seed(0);
         return GenericResponse.<String>builder()
                 .message("Seeded database")
