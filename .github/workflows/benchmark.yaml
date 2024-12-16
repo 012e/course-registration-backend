@@ -1,13 +1,14 @@
 name: Benchmark
 
 on:
-  pull_request: {}
+  pull_request: { }
 
 env:
   BENCHMARK_DURATION: 20s
 
 jobs:
   benchmark:
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
@@ -15,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        profile: [cache, database]
+        profile: [ cache-light, cache-heavy, database-light, database-heavy ]
 
     steps:
       - name: Checkout code
@@ -35,7 +36,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and run stack
-        run: docker compose --profile ${{ matrix.profile }} --profile test up --build -d
+        if: startsWith(matrix.profile, 'database')
+        run: docker compose --profile database --profile test up --build -d
+
+      - name: Build and run stack
+        if: startsWith(matrix.profile, 'cache')
+        run: docker compose --profile cache --profile test up --build -d
 
       - name: Wait stack startup
         run: |
@@ -47,15 +53,31 @@ jobs:
             localhost:8080/public/hello
 
       - name: Seed data
+        if: endsWith(matrix.profile, 'heavy')
         run: |
           curl -X 'GET' \
-            'http://localhost:8080/seed/all' \
+            'http://localhost:8080/seed/all/heavy' \
             -H 'accept: application/json'
 
-      - name: Prepare cache 
+      - name: Seed data
+        if: endsWith(matrix.profile, 'light')
+        run: |
+          curl -X 'GET' \
+            'http://localhost:8080/seed/all/light' \
+            -H 'accept: application/json'
+
+      - name: Prepare cache
+        if: startsWith(matrix.profile, 'cache')
         run: |
           curl -X 'GET' \
             'http://localhost:8080/cache/prepareCourses' \
+            -H 'accept: application/json'
+
+      - name: Prepare cache
+        if: startsWith(matrix.profile, 'cache')
+        run: |
+          curl -X 'GET' \
+            'http://localhost:8080/cache/sync/counter' \
             -H 'accept: application/json'
 
       - name: Run benchmark
@@ -86,4 +108,9 @@ jobs:
             });
 
       - name: Clean up stack
-        run: docker compose --profile ${{ matrix.profile }} --profile test down
+        if: startsWith(matrix.profile, 'database')
+        run: docker compose --profile database --profile test down
+
+      - name: Clean up stack
+        if: startsWith(matrix.profile, 'cache')
+        run: docker compose --profile cache --profile test down
