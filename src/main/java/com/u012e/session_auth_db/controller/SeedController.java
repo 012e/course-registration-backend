@@ -84,10 +84,10 @@ public class SeedController {
 
     @GetMapping("all")
     public GenericResponse<String> seedAll() {
-        studentSeeder.seed(200);
-        subjectSeeder.seed(50);
-        courseSeeder.seed(200);
-        resultSeeder.seed(10);
+        studentSeeder.seed(10000);
+        subjectSeeder.seed(2000);
+        courseSeeder.seed(1000);
+        resultSeeder.seed(100);
         dependencySeeder.seed(0);
         return GenericResponse.<String>builder()
                 .message("Seeded database")
