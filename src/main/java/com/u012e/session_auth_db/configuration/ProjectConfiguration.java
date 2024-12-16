@@ -1,15 +1,14 @@
 package com.u012e.session_auth_db.configuration;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import net.datafaker.Faker;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Random;
 
 @Configuration
+@EnableScheduling
 public class ProjectConfiguration {
     @Bean
     ModelMapper modelMapper() {

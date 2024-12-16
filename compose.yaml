@@ -11,7 +11,7 @@ services:
     command: --spring.profiles.active=database
     ports:
       - '8080:8080'
-    profiles:  [ "database" ]
+    profiles: [ "database" ]
     deploy:
       restart_policy:
         condition: on-failure
@@ -28,6 +28,19 @@ services:
     ports:
       - '8080:8080'
     profiles: [ "cache" ]
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 20s
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
     deploy:
       restart_policy:
         condition: on-failure
