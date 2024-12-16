@@ -3,11 +3,11 @@ package com.u012e.session_auth_db.utils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Optional;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class GenericResponse<T> {
     private boolean success;
