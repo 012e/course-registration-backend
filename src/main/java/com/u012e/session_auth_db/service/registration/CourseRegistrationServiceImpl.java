@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class DatabaseCourseRegistrationService implements CourseRegistrationService {
+public class CourseRegistrationServiceImpl implements CourseRegistrationService {
     private final DependencyChecker dependencyChecker;
     private final CourseService courseService;
     private final StudentRepository studentRepository;

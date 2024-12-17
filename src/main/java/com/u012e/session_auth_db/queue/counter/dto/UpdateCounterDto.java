@@ -1,15 +1,20 @@
 package com.u012e.session_auth_db.queue.counter.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateCounterDto {
+public class UpdateCounterDto implements Serializable {
+    @NotNull
     private Long courseId;
-    private Long count;
+    @NotNull
+    private CounterOperation operation;
 }

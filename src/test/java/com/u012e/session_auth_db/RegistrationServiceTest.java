@@ -5,7 +5,7 @@ import com.u012e.session_auth_db.model.Student;
 import com.u012e.session_auth_db.model.Subject;
 import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CourseService;
-import com.u012e.session_auth_db.service.registration.DatabaseCourseRegistrationService;
+import com.u012e.session_auth_db.service.registration.CourseRegistrationServiceImpl;
 import com.u012e.session_auth_db.service.registration.DatabaseParticipantCounterService;
 import com.u012e.session_auth_db.service.registration.DependencyChecker;
 import com.u012e.session_auth_db.utils.RegistrationResult;
@@ -36,7 +36,7 @@ public class RegistrationServiceTest {
     private DatabaseParticipantCounterService participantCounterService;
 
     @InjectMocks
-    private DatabaseCourseRegistrationService registrationService;
+    private CourseRegistrationServiceImpl registrationService;
 
     @Test
     void StudentRegisterEmptyCourse() {
