@@ -2,6 +2,7 @@ package com.u012e.session_auth_db.service.registration;
 
 import com.u012e.session_auth_db.configuration.CacheConfiguration;
 import com.u012e.session_auth_db.model.Course;
+import com.u012e.session_auth_db.queue.counter.CounterProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CacheParticipantCounterService implements ParticipantCounterService {
     private final ValueOperations<String, Integer> valueOperation;
+    private final CounterProducer counterProducer;
 
     private String getKeyOfCount(Course course) {
         return String.format("%s:%d", CacheConfiguration.PARTICIPANT_CACHE, course.getId());
@@ -28,6 +30,7 @@ public class CacheParticipantCounterService implements ParticipantCounterService
         final var key = getKeyOfCount(course);
         log.trace("Incrementing key: {}", key);
         valueOperation.increment(key);
+        counterProducer.increase(course);
     }
 
     @Override
@@ -35,6 +38,7 @@ public class CacheParticipantCounterService implements ParticipantCounterService
         final var key = getKeyOfCount(course);
         log.trace("Decrementing key: {}", key);
         valueOperation.decrement(key);
+        counterProducer.decrease(course);
     }
 
     @Override
