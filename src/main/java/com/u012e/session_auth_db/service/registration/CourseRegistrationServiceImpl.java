@@ -33,23 +33,13 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         return flattenedSet;
     }
 
-    private static Set<Subject> getLearnedSubjects(Student student) {
-        return student
-                .getResults()
-                .parallelStream()
-                .map(result -> result.getCourse()
-                        .getSubject())
-                .collect(Collectors.toSet());
-    }
-
     @Override
     public RegistrationResult register(Student student, List<Long> courseIds) {
         var courses = getCoursesById(courseIds);
-        var learnedSubjects = getLearnedSubjects(student);
 
         // Check dependencies
         log.trace("Checking dependencies for student {} and courses {}", student, courses);
-        var dependencyCheckResult = dependencyChecker.checkDependencies(courses, learnedSubjects);
+        var dependencyCheckResult = dependencyChecker.checkDependencies(student, courses);
 
         // Check for free slots
         log.trace("Checking for free slots for student {} and courses {}", student, courses);
