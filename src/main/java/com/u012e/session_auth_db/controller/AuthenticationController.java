@@ -56,8 +56,10 @@ public class AuthenticationController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        log.trace("getting random user");
         var randomUser = studentService.getStudentById(1L);
         if (randomUser.isEmpty()) {
+            log.trace("there is no user");
             return GenericResponse.<Map<String, String>>builder()
                     .success(false)
                     .message("There is no user in the database, please seed the database first")
