@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,16 +35,9 @@ public class CacheController {
     @GetMapping("prepareCourses")
     public GenericResponse<Object> prepareCourseCaching() {
         var students = studentRepository.findAll();
-        var top10Courses = courseRepository.findTop10ByOrderByIdAsc();
+        var top10Courses = new HashSet<>(courseRepository.findTop10ByOrderByIdAsc());
         for (var student : students) {
-            var learnedSubjects = student.getCourses()
-                    .stream()
-                    .map(Course::getSubject)
-                    .collect(Collectors.toSet());
-            for (var course : top10Courses) {
-                dependencyChecker.checkDependency(course, learnedSubjects);
-            }
-
+            dependencyChecker.checkDependencies(student, top10Courses);
         }
         return GenericResponse.builder()
                 .message("prepared course successfully")
