@@ -16,7 +16,7 @@ import java.util.List;
 public class HelloWorldConsumer {
     @RabbitHandler
     public void receive(@Valid @Payload List<MessageDto> message) {
-        log.info(" [x] Received '{}'", message.getFirst()
-                .getMessage());
+//        log.info(" [x] Received '{}'", message.getFirst()
+//                .getMessage());
     }
 }
