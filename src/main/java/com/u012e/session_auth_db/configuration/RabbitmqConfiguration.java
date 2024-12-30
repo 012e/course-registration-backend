@@ -1,5 +1,6 @@
 package com.u012e.session_auth_db.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -17,7 +18,8 @@ public class RabbitmqConfiguration {
 
     @Bean
     public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return new Jackson2JsonMessageConverter(objectMapper);
     }
 
     @Bean("rabbitmq")

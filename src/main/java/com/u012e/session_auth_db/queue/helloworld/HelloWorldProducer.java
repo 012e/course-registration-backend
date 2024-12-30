@@ -25,6 +25,6 @@ public class HelloWorldProducer {
                 .message("Hello world")
                 .build();
         template.convertAndSend(queue.getName(), message);
-//        log.info(" [x] Sent '{}'", message);
+        log.info(" [x] Sent '{}'", message);
     }
 }
