@@ -10,4 +10,5 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class CacheConfiguration {
     public static final String PARTICIPANT_CACHE = "participantCache";
+    public static final String DEPENDENCY_CACHE = "dependencyCache";
 }
