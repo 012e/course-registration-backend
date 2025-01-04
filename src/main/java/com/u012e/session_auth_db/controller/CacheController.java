@@ -35,22 +35,24 @@ public class CacheController {
     public GenericResponse<Object> prepareCourseCaching() {
         var students = studentRepository.findAll();
         var courses = courseRepository.findAll();
-        for (var student : students) {
-            for (var course: courses) {
+        students.parallelStream().forEach(student -> {
+            courses.forEach(course -> {
                 String value = BloomFilterManager.getValue(student, course);
                 boolean dependencyResult = databaseDependencyChecker.checkDependency(student, course);
                 if (dependencyResult){
                     BloomFilterManager.main.put(value);
                 }
-                if (!BloomFilterManager.main.mightContain(value)){
-                    continue;
-                }
-                if (!dependencyResult){
+            });
+        });
+        students.parallelStream().forEach(student -> {
+            courses.forEach(course -> {
+                String value = BloomFilterManager.getValue(student, course);
+                boolean dependencyResult = databaseDependencyChecker.checkDependency(student, course);
+                if (BloomFilterManager.main.mightContain(value) && !dependencyResult){
                     BloomFilterManager.backup.put(value);
                 }
-            }
-        }
-
+            });
+        });
         return GenericResponse.builder()
                 .message("prepared course successfully")
                 .data(null)
