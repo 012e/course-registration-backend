@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findTop10ByOrderByIdAsc();
 
+    List<Course> findAllByStudentsId(Long id);
+
     Stream<Course> findAllBy();
 
     Set<Course> findByStudents(Student student);

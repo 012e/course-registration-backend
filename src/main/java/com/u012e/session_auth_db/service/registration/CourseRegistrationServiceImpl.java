@@ -2,10 +2,12 @@ package com.u012e.session_auth_db.service.registration;
 
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.model.Student;
+import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.utils.RegistrationResult;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -13,13 +15,31 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class CourseRegistrationServiceImpl implements CourseRegistrationService {
     private final DependencyChecker dependencyChecker;
     private final CourseService courseService;
     private final ParticipantCounterService participantCounterService;
     private final CourseApplyRegistrationService courseApplyRegistrationService;
+    private final StudentRepository studentRepository;
+
+    // CacheManager doesn't exist while running with cache profile
+    @Autowired(required = false)
+    private CacheManager cacheManager;
+
+    public CourseRegistrationServiceImpl(
+            DependencyChecker dependencyChecker,
+            CourseService courseService,
+            StudentRepository studentRepository,
+            ParticipantCounterService participantCounterService,
+            CourseApplyRegistrationService courseApplyRegistrationService
+    ) {
+        this.dependencyChecker = dependencyChecker;
+        this.courseService = courseService;
+        this.studentRepository = studentRepository;
+        this.participantCounterService = participantCounterService;
+        this.courseApplyRegistrationService = courseApplyRegistrationService;
+    }
 
     @SafeVarargs
     public static <T> Set<T> union(Set<T>... sets) {
@@ -48,10 +68,30 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
         log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
+        // Finally save
+        log.trace("Saving student registration to database {}", student);
+        var oldCourses = student.getCourses();
+        oldCourses.addAll(acceptedCourses);
+        student.setCourses(oldCourses);
+        studentRepository.save(student);
+        log.trace("Saved student registration to database {}", student);
+
+        evictRegisteredCoursesCache(student);
+
         return RegistrationResult.builder()
                 .failed(failedCourses)
                 .succeed(acceptedCourses)
                 .build();
+    }
+
+    private void evictRegisteredCoursesCache(Student student) {
+        if (cacheManager == null) return;
+
+        var registeredSubjectCache = cacheManager.getCache("registeredCourses");
+        if (registeredSubjectCache != null) {
+            log.trace("Evicting registered courses cache for student {}", student);
+            registeredSubjectCache.evict(student.getId());
+        }
     }
 
     @Override

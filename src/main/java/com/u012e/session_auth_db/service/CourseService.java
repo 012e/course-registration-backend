@@ -19,5 +19,7 @@ public interface CourseService {
 
     List<ResponseCourseDto> getAll();
 
+    List<ResponseCourseDto> getAllRegisteredCourse(Long studentId);
+
     List<Course> getCourseByIds(List<Long> ids);
 }

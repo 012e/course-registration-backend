@@ -2,7 +2,9 @@ package com.u012e.session_auth_db.controller;
 
 import com.u012e.session_auth_db.dto.CreateRegistrationDto;
 import com.u012e.session_auth_db.dto.RegistrationResultDto;
+import com.u012e.session_auth_db.dto.ResponseCourseDto;
 import com.u012e.session_auth_db.model.Course;
+import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.service.StudentService;
 import com.u012e.session_auth_db.service.registration.CourseApplyRegistrationService;
 import com.u012e.session_auth_db.service.registration.CourseRegistrationService;
@@ -15,13 +17,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/registration")
 @RequiredArgsConstructor
 @Slf4j
 public class CourseRegistrationController {
-    private final StudentService studentService;
     private final CourseRegistrationService courseRegistrationService;
+    private final CourseService courseService;
+    private final StudentService studentService;
+
+    @GetMapping("registered")
+    public GenericResponse<List<ResponseCourseDto>> registeredSubjects(@AuthenticationPrincipal UserDetails userDetails) {
+        var student = studentService.getStudentByUsername(userDetails.getUsername())
+                .orElseThrow();
+        return GenericResponse.success(courseService.getAllRegisteredCourse(student.getId()));
+    }
 
     @PostMapping()
     public GenericResponse<RegistrationResultDto> register(@RequestBody @Valid CreateRegistrationDto registrationDto, @AuthenticationPrincipal UserDetails userDetails) {
