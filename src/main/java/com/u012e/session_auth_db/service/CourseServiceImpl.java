@@ -8,6 +8,7 @@ import com.u012e.session_auth_db.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -113,6 +114,16 @@ public class CourseServiceImpl implements CourseService {
     public List<ResponseCourseDto> getAll() {
         return courseRepository
                 .findAll()
+                .stream()
+                .map(course -> modelMapper.map(course, ResponseCourseDto.class))
+                .toList();
+    }
+
+    @Override
+    @Cacheable(value = "registeredCourses", key = "#studentId")
+    public List<ResponseCourseDto> getAllRegisteredCourse(Long studentId) {
+        return courseRepository
+                .findAllByStudentsId(studentId)
                 .stream()
                 .map(course -> modelMapper.map(course, ResponseCourseDto.class))
                 .toList();
