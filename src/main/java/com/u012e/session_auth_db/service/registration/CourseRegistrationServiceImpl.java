@@ -2,8 +2,6 @@ package com.u012e.session_auth_db.service.registration;
 
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.model.Student;
-import com.u012e.session_auth_db.model.Subject;
-import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.utils.RegistrationResult;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +18,6 @@ import java.util.stream.Collectors;
 public class CourseRegistrationServiceImpl implements CourseRegistrationService {
     private final DependencyChecker dependencyChecker;
     private final CourseService courseService;
-    private final StudentRepository studentRepository;
     private final ParticipantCounterService participantCounterService;
 
     @SafeVarargs
@@ -50,14 +46,6 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         var acceptedCourses = freeSlotResult.getSucceed();
         log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
-        // Finally save
-        log.trace("Saving student registration to database {}", student);
-        var oldCourses = student.getCourses();
-        oldCourses.addAll(acceptedCourses);
-        student.setCourses(oldCourses);
-        studentRepository.save(student);
-        log.trace("Saved student registration to database {}", student);
-
         return RegistrationResult.builder()
                 .failed(failedCourses)
                 .succeed(acceptedCourses)
@@ -65,11 +53,12 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     }
 
     @Override
-    public RegistrationResult unregister(Student student, List<Long> courseIds) {
+    public RegistrationResult unregister(Student student, List<Long> courseIds, Set<Course> oldCourses) {
         var courses = getCoursesById(courseIds);
-        var oldCourses = student.getCourses();
+
         var failed = new HashSet<Course>();
         var succeed = new HashSet<Course>();
+
         for (var course : courses) {
             if (oldCourses.remove(course)) {
                 participantCounterService.freeSlot(course);
@@ -78,8 +67,6 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
                 failed.add(course);
             }
         }
-        student.setCourses(oldCourses);
-        studentRepository.save(student);
         return RegistrationResult.builder()
                 .failed(failed)
                 .succeed(succeed)
@@ -89,22 +76,24 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     private RegistrationResult registerOnFreeSlots(Set<Course> courses) {
         var ok = new HashSet<Course>();
         var failed = new HashSet<Course>();
+
         for (var course : courses) {
             if (participantCounterService.isFull(course)) {
                 log.warn("Course {} is full", course);
                 failed.add(course);
-                continue;
+            } else {
+                ok.add(course);
+                participantCounterService.takeSlot(course);
             }
-            ok.add(course);
-            participantCounterService.takeSlot(course);
         }
+
         return RegistrationResult.builder()
                 .failed(failed)
                 .succeed(ok)
                 .build();
     }
 
-    private HashSet<Course> getCoursesById(List<Long> courseIds) {
+    public HashSet<Course> getCoursesById(List<Long> courseIds) {
         return new HashSet<>(courseService.getAllById(courseIds));
     }
 }

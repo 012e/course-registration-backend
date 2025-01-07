@@ -10,7 +10,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RabbitListener(queues = "registration")
 public class RegistrationConsumer {
-    private StudentRepository studentRepository;
+    final private StudentRepository studentRepository;
 
     @RabbitListener(queues = "registration")
     public void consume(@Payload List<@Valid UpdateRegistrationDto> dtos) {
