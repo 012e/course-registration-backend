@@ -11,6 +11,10 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.lang.reflect.Array;
+import java.util.HashSet;
+import java.util.Set;
+
 @Configuration
 public class RedisConfiguration {
     @Value("${spring.data.redis.host}")
@@ -28,12 +32,25 @@ public class RedisConfiguration {
     }
 
     public RedisTemplate<String, String> redisTemplateString(
-            @Qualifier("redis") RedisConnectionFactory connectionFactory
+            @Qualifier("redis")
+            RedisConnectionFactory connectionFactory
     ) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new StringRedisSerializer());
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    public RedisTemplate<String, HashSet<Long>> redisTemplateStringArray(
+            @Qualifier("redis")
+            RedisConnectionFactory connectionFactory
+    ) {
+        RedisTemplate<String, HashSet<Long>> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(Array.class));
         template.afterPropertiesSet();
         return template;
     }
@@ -71,6 +88,16 @@ public class RedisConfiguration {
 
     @Bean
     public ValueOperations<String, Long> valueOperationsLong(RedisTemplate<String, Long> redisTemplate) {
+        return redisTemplate.opsForValue();
+    }
+
+    @Bean
+    public ValueOperations<String, String> valueOperationsString(RedisTemplate<String, String> redisTemplate) {
+        return redisTemplate.opsForValue();
+    }
+
+    @Bean
+    public ValueOperations<String, HashSet<Long>> valueOperationsStringArray(RedisTemplate<String, HashSet<Long>> redisTemplate) {
         return redisTemplate.opsForValue();
     }
 }
