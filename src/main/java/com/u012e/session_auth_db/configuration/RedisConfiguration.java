@@ -13,7 +13,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.lang.reflect.Array;
 import java.util.HashSet;
-import java.util.Set;
 
 @Configuration
 public class RedisConfiguration {
@@ -43,6 +42,7 @@ public class RedisConfiguration {
         return template;
     }
 
+    @Bean
     public RedisTemplate<String, HashSet<Long>> redisTemplateStringArray(
             @Qualifier("redis")
             RedisConnectionFactory connectionFactory
