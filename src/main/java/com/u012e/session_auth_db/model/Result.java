@@ -1,5 +1,6 @@
 package com.u012e.session_auth_db.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,9 +24,11 @@ public class Result implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference("student-result")
     @ManyToOne(optional = false)
     private Student student;
 
+    @JsonBackReference("course-result")
     @ManyToOne(optional = false)
     private Course course;
 

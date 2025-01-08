@@ -117,4 +117,9 @@ public class CourseServiceImpl implements CourseService {
                 .map(course -> modelMapper.map(course, ResponseCourseDto.class))
                 .toList();
     }
+
+    @Override
+    public List<Course> getCourseByIds(List<Long> ids) {
+        return courseRepository.findAllById(ids);
+    }
 }

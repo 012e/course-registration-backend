@@ -18,4 +18,6 @@ public interface CourseService {
     List<Course> getAllById(List<Long> ids);
 
     List<ResponseCourseDto> getAll();
+
+    List<Course> getCourseByIds(List<Long> ids);
 }

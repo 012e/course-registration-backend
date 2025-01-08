@@ -10,6 +10,5 @@ import java.util.Set;
 
 public interface CourseRegistrationService {
     RegistrationResult register(Student student, List<Long> courseIds);
-    RegistrationResult unregister(Student student, List<Long> courseIds, Set<Course> oldCourses);
-    HashSet<Course> getCoursesById(List<Long> courseIds);
+    RegistrationResult unregister(Student student, List<Long> courseIds);
 }

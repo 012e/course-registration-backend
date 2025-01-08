@@ -1,5 +1,6 @@
 package com.u012e.session_auth_db.dto;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;

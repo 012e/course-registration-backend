@@ -1,5 +1,7 @@
 package com.u012e.session_auth_db.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -71,6 +73,7 @@ public class Student implements UserDetails, Serializable {
     )
     private Set<Course> courses = new HashSet<>();
 
+    @JsonManagedReference("student-result")
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Result> results = new HashSet<>();
 

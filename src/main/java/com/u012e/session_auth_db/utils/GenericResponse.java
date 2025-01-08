@@ -1,5 +1,6 @@
 package com.u012e.session_auth_db.utils;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

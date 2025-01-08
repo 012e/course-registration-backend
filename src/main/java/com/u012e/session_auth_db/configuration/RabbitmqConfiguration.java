@@ -1,6 +1,9 @@
 package com.u012e.session_auth_db.configuration;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -19,6 +22,9 @@ public class RabbitmqConfiguration {
     @Bean
     public MessageConverter messageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance()
+                .withFieldVisibility(JsonAutoDetect.Visibility.ANY));
         return new Jackson2JsonMessageConverter(objectMapper);
     }
 

@@ -1,5 +1,7 @@
 package com.u012e.session_auth_db.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,6 +64,7 @@ public class Course implements Serializable {
                 '}';
     }
 
+    @JsonBackReference("subject-course")
     @ManyToOne(optional = false)
     private Subject subject;
 
