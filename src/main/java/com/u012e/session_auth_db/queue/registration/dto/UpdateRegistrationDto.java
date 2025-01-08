@@ -17,9 +17,9 @@ import java.util.Set;
 @AllArgsConstructor
 public class UpdateRegistrationDto implements Serializable {
     @NotNull
-    private Student student;
+    private Long studentId;
     @NotNull
-    private Set<Course> courses;
+    private Set<Long> courseIds;
     @NotNull
     private RegistrationOperation operation;
 }

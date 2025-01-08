@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RegistrationProducer {
@@ -23,8 +24,10 @@ public class RegistrationProducer {
 
     public void addCourses(Set<Course> courses, Student student) {
         var dto = UpdateRegistrationDto.builder()
-                .courses(courses)
-                .student(student)
+                .courseIds(courses.stream()
+                        .map(Course::getId)
+                        .collect(Collectors.toSet()))
+                .studentId(student.getId())
                 .operation(RegistrationOperation.ADD_COURSES)
                 .build();
         rabbitTemplate.convertAndSend(queue.getName(), dto);
@@ -32,8 +35,10 @@ public class RegistrationProducer {
 
     public void removeCourses(Set<Course> courses, Student student) {
         var dto = UpdateRegistrationDto.builder()
-                .courses(courses)
-                .student(student)
+                .courseIds(courses.stream()
+                        .map(Course::getId)
+                        .collect(Collectors.toSet()))
+                .studentId(student.getId())
                 .operation(RegistrationOperation.REMOVE_COURSES)
                 .build();
         rabbitTemplate.convertAndSend(queue.getName(), dto);
