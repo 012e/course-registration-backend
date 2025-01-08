@@ -32,17 +32,13 @@ public class RegistrationConsumer {
         var processedStudents = new ArrayList<Student>(dtos.size());
         for (UpdateRegistrationDto dto : dtos) {
             // TODO: better error handling
-            final var student = studentRepository.findById(dto.getStudent()
-                            .getId())
+            final var student = studentRepository.findById(dto.getStudentId())
                     .orElseThrow();
 
             final var registeredCourses = courseRepository.findByStudents(student);
 
             final var courses = courseRepository.findAllById(
-                    dto.getCourses()
-                            .stream()
-                            .map(Course::getId)
-                            .collect(Collectors.toSet())
+                    dto.getCourseIds()
             );
 
             final var operation = dto.getOperation();
