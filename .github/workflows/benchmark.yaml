@@ -47,7 +47,7 @@ jobs:
         run: |
           curl \
             --retry-all-errors \
-            --retry 5 \
+            --retry 10 \
             --connect-timeout 1 \
             --retry-delay 3 \
             localhost:8080/public/hello
