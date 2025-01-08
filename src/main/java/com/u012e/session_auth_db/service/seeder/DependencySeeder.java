@@ -17,7 +17,7 @@ public class DependencySeeder implements Seeder<Dependency> {
     private final DependencyRepository dependencyRepository;
 
     private final int MIN_DEPENDENCIES = 0;
-    private final int MAX_DEPENDENCIES = 5;
+    private final int MAX_DEPENDENCIES = 3;
 
 
     @Override

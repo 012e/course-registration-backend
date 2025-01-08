@@ -4,7 +4,7 @@ on:
   pull_request: { }
 
 env:
-  BENCHMARK_DURATION: 20s
+  BENCHMARK_DURATION: 60s
 
 jobs:
   benchmark:
