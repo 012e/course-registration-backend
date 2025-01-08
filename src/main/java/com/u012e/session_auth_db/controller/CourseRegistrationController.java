@@ -5,6 +5,7 @@ import com.u012e.session_auth_db.dto.RegistrationResultDto;
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.service.StudentService;
 import com.u012e.session_auth_db.service.registration.CourseApplyRegistrationService;
+import com.u012e.session_auth_db.service.registration.CourseRegistrationService;
 import com.u012e.session_auth_db.utils.GenericResponse;
 import com.u012e.session_auth_db.utils.RegistrationResult;
 import jakarta.validation.Valid;
@@ -19,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class CourseRegistrationController {
-    private final CourseApplyRegistrationService courseApplyRegistrationService;
     private final StudentService studentService;
+    private final CourseRegistrationService courseRegistrationService;
 
     @PostMapping()
     public GenericResponse<RegistrationResultDto> register(@RequestBody @Valid CreateRegistrationDto registrationDto, @AuthenticationPrincipal UserDetails userDetails) {
@@ -28,7 +29,7 @@ public class CourseRegistrationController {
         var student = studentService.getStudentByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
         log.trace("Student {} is registering for courses: {}", student, registrationDto.getCourseIds());
-        var result = courseApplyRegistrationService.register(student, registrationDto.getCourseIds());
+        var result = courseRegistrationService.register(student, registrationDto.getCourseIds());
         return mapResultDto(result);
     }
 
@@ -38,7 +39,7 @@ public class CourseRegistrationController {
         var student = studentService.getStudentByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
         log.trace("Student {} is unregistering for courses: {}", student, registrationDto.getCourseIds());
-        var result = courseApplyRegistrationService.unregister(student, registrationDto.getCourseIds());
+        var result = courseRegistrationService.unregister(student, registrationDto.getCourseIds());
         return mapResultDto(result);
     }
 

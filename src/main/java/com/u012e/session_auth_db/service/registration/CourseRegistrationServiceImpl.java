@@ -19,6 +19,7 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     private final DependencyChecker dependencyChecker;
     private final CourseService courseService;
     private final ParticipantCounterService participantCounterService;
+    private final CourseApplyRegistrationService courseApplyRegistrationService;
 
     @SafeVarargs
     public static <T> Set<T> union(Set<T>... sets) {
@@ -44,6 +45,7 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         // Collect failed and accepted courses
         var failedCourses = union(dependencyCheckResult.getFailed(), freeSlotResult.getFailed());
         var acceptedCourses = freeSlotResult.getSucceed();
+        courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
         log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
         return RegistrationResult.builder()
@@ -53,8 +55,9 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     }
 
     @Override
-    public RegistrationResult unregister(Student student, List<Long> courseIds, Set<Course> oldCourses) {
+    public RegistrationResult unregister(Student student, List<Long> courseIds) {
         var courses = getCoursesById(courseIds);
+        var oldCourses = student.getCourses();
 
         var failed = new HashSet<Course>();
         var succeed = new HashSet<Course>();
@@ -67,6 +70,9 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
                 failed.add(course);
             }
         }
+
+        courseApplyRegistrationService.removeRegistration(student, succeed);
+
         return RegistrationResult.builder()
                 .failed(failed)
                 .succeed(succeed)

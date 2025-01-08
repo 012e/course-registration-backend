@@ -1,5 +1,7 @@
 package com.u012e.session_auth_db.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,6 +48,7 @@ public class Subject implements Serializable {
                 '}';
     }
 
+    @JsonManagedReference("subject-course")
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Course> courses = new HashSet<>();
 }
