@@ -70,14 +70,7 @@ jobs:
         if: startsWith(matrix.profile, 'cache')
         run: |
           curl -X 'GET' \
-            'http://localhost:8080/cache/prepareCourses' \
-            -H 'accept: application/json'
-
-      - name: Prepare cache
-        if: startsWith(matrix.profile, 'cache')
-        run: |
-          curl -X 'GET' \
-            'http://localhost:8080/cache/sync/counter' \
+            'http://localhost:8080/cache/sync/all' \
             -H 'accept: application/json'
 
       - name: Run benchmark

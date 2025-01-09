@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Profile("database")
 @RequiredArgsConstructor
@@ -40,5 +42,24 @@ public class DatabaseParticipantCounterService implements ParticipantCounterServ
     @Transactional
     public boolean isFull(Course course) {
         return course.getParticipantsCount() >= course.getMaxParticipants();
+    }
+
+    @Override
+    public int getCount(Course course) {
+        return course.getParticipantsCount();
+    }
+
+    @Override
+    public int getCount(Long courseId) {
+        var course = courseRepository.getCourseById(courseId);
+        return course.getParticipantsCount();
+    }
+
+    @Override
+    public List<Integer> getCounts(List<Long> courseIds) {
+        var courses = courseRepository.getCoursesByIdIn(courseIds);
+        return courses.parallelStream()
+                .map(Course::getParticipantsCount)
+                .toList();
     }
 }

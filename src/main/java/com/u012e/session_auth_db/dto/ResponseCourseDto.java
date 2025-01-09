@@ -17,5 +17,6 @@ public class ResponseCourseDto implements Serializable {
     private Integer endPeriod;
     private Integer dayOfWeek;
     private Integer maxParticipants;
+    private Integer participantsCount;
     private ResponseSubjectDto subject;
 }

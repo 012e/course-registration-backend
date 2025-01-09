@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Profile("cache")
 @RequiredArgsConstructor
@@ -19,6 +22,10 @@ public class CacheParticipantCounterService implements ParticipantCounterService
 
     private String getKeyOfCount(Course course) {
         return String.format("%s:%d", CacheConfiguration.PARTICIPANT_CACHE, course.getId());
+    }
+
+    private String getKeyOfCount(Long courseId) {
+        return String.format("%s:%d", CacheConfiguration.PARTICIPANT_CACHE, courseId);
     }
 
     private String getKeyOfLimit(Course course) {
@@ -65,8 +72,27 @@ public class CacheParticipantCounterService implements ParticipantCounterService
     }
 
     // TODO: is there any race condition?
-    private Long getCount(Course course) {
+    public int getCount(Course course) {
         final var key = getKeyOfCount(course);
-        return getValue(key);
+        return Math.toIntExact(getValue(key));
     }
+
+    @Override
+    public int getCount(Long courseId) {
+        final var key = getKeyOfCount(courseId);
+        return Math.toIntExact(getValue(key));
+    }
+
+    @Override
+    public List<Integer> getCounts(List<Long> courseIds) {
+        var keys = new ArrayList<>(courseIds).parallelStream()
+                .map(this::getKeyOfCount)
+                .toList();
+        var results = valueOperation.multiGet(keys);
+        return results.parallelStream()
+                .map(value -> value == null ? 0 : value)
+                .map(Number::intValue)
+                .toList();
+    }
+
 }

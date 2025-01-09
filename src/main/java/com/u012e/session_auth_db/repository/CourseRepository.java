@@ -18,4 +18,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Stream<Course> findAllBy();
 
     Set<Course> findByStudents(Student student);
+
+    Course getCourseById(Long id);
+
+    List<Course> getCoursesByIdIn(List<Long> courseIds);
 }

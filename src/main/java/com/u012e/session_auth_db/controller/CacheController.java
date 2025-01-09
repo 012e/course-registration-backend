@@ -1,8 +1,8 @@
 package com.u012e.session_auth_db.controller;
 
-import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
+import com.u012e.session_auth_db.service.CachedCourseService;
 import com.u012e.session_auth_db.service.registration.DependencyChecker;
 import com.u012e.session_auth_db.service.syncer.ParticipantCounterSyncer;
 import com.u012e.session_auth_db.utils.GenericResponse;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cache")
@@ -21,6 +20,7 @@ public class CacheController {
     private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final DependencyChecker dependencyChecker;
+    private final CachedCourseService cachedCourseService;
     private final ParticipantCounterSyncer participantCounterSyncer;
 
     @GetMapping("sync/counter")
@@ -31,6 +31,27 @@ public class CacheController {
                 .data(null)
                 .build();
     }
+
+    @GetMapping("sync/courses")
+    public GenericResponse<Object> syncCourses() {
+        cachedCourseService.syncCache();
+        return GenericResponse.builder()
+                .message("synced courses successfully")
+                .data(null)
+                .build();
+    }
+
+    @GetMapping("sync/all")
+    public GenericResponse<Object> syncAll() {
+        participantCounterSyncer.sync();
+        cachedCourseService.syncCache();
+        return GenericResponse.builder()
+                .message("synced all successfully")
+                .data(null)
+                .build();
+    }
+
+
 
     @GetMapping("prepareCourses")
     public GenericResponse<Object> prepareCourseCaching() {
