@@ -40,6 +40,9 @@ public class CourseRegistrationController {
     public GenericResponse<List<ResponseCourseDto>> registeredSubjects(@AuthenticationPrincipal UserDetails userDetails) {
         var student = studentService.getStudentByUsername(userDetails.getUsername())
                 .orElseThrow();
+        if (cachedCourseService != null) {
+            return GenericResponse.success(cachedCourseService.getAllRegisteredCourses(student.getId()));
+        }
         return GenericResponse.success(courseService.getAllRegisteredCourse(student.getId()));
     }
 
