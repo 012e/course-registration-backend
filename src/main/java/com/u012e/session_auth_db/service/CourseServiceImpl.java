@@ -5,21 +5,29 @@ import com.u012e.session_auth_db.dto.ResponseCourseDto;
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.SubjectRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final SubjectRepository subjectRepository;
     private final ModelMapper modelMapper;
+
+    @Autowired(required = false)
+    private CacheManager cacheManager;
+
+    public CourseServiceImpl(CourseRepository courseRepository, SubjectRepository subjectRepository, ModelMapper modelMapper) {
+        this.courseRepository = courseRepository;
+        this.subjectRepository = subjectRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @Override
     public long createCourse(CreateCourseDto courseDto) {
@@ -120,7 +128,6 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    @Cacheable(value = "registeredCourses", key = "#studentId")
     public List<ResponseCourseDto> getAllRegisteredCourse(Long studentId) {
         return courseRepository
                 .findAllByStudentsId(studentId)

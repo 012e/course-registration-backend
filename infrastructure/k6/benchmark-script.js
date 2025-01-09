@@ -76,7 +76,7 @@ function randomFloatBetween(min, max) {
 }
 
 function waitRandomly() {
-  sleep(randomFloatBetween(0.1, 1));
+  sleep(randomFloatBetween(0.1, 0.5));
 }
 
 function register(data) {
@@ -126,6 +126,13 @@ function checkRegisteredCourses() {
   });
 }
 
+function getAllCourses() {
+  const result = http.get(`${URL}/courses`, JSON_PARAMS);
+  check(result, {
+    "all courses response is 200": (r) => r.status === 200,
+  });
+}
+
 export default function () {
   const authInfo = getAuthInfo();
 
@@ -134,15 +141,16 @@ export default function () {
   login(loginData);
   waitRandomly();
 
-  const totalTries = randomIntBetween(1, 10);
+  const totalTries = randomIntBetween(1, 20);
   for (let i = 0; i < totalTries; i++) {
-    registerRandomCourses();
-    waitRandomly();
-
-    const checkCourses = randomIntBetween(1, 5);
-    for (let j = 0; j < checkCourses; j++) {
-      checkRegisteredCourses();
+    const totalPageRefresh = randomIntBetween(1, 10);
+    for (let j = 0; j < totalPageRefresh; j++) {
+      getAllCourses();
+      waitRandomly();
+      registerRandomCourses();
       waitRandomly();
     }
+    checkRegisteredCourses();
+    waitRandomly();
   }
 }

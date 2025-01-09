@@ -2,22 +2,30 @@ package com.u012e.session_auth_db.controller;
 
 import com.u012e.session_auth_db.dto.CreateCourseDto;
 import com.u012e.session_auth_db.dto.ResponseCourseDto;
+import com.u012e.session_auth_db.service.CachedCourseService;
 import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.utils.GenericResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(path = "/course")
 @Slf4j
 public class CourseController {
     private final CourseService courseService;
+
+    @Autowired(required = false)
+    private CachedCourseService cachedCourseService;
+
+    public CourseController(CourseService courseService, CachedCourseService cachedCourseService) {
+        this.courseService = courseService;
+        this.cachedCourseService = cachedCourseService;
+    }
 
     @PostMapping("/")
     public GenericResponse<Long> create(@Valid @RequestBody CreateCourseDto courseDto) {
@@ -48,7 +56,11 @@ public class CourseController {
     }
 
     @GetMapping("/")
-    public GenericResponse<List<ResponseCourseDto>> get() {
+    public GenericResponse<List<ResponseCourseDto>> getAll() {
+        if (cachedCourseService != null) {
+            return GenericResponse.success(cachedCourseService.getAllCourses());
+        }
         return GenericResponse.success(courseService.getAll());
     }
+
 }
