@@ -100,6 +100,7 @@ public class CachedCourseService {
 
     public void syncCache() {
         var courses = courseService.getAll();
+        courses.sort(Comparator.comparing(ResponseCourseDto::getId));
         var key = getKeyOfCourses();
         courseCache.set(key, new ArrayList<>(courses));
     }
