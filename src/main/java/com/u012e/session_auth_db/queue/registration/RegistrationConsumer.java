@@ -48,7 +48,7 @@ public class RegistrationConsumer {
                     registeredCourses.addAll(courses);
                 }
                 case REMOVE_COURSES -> {
-                    registeredCourses.removeAll(courses);
+                    courses.forEach(registeredCourses::remove);
                 }
             }
             student.setCourses(registeredCourses);
