@@ -2,12 +2,9 @@ package com.u012e.session_auth_db.service.registration;
 
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.model.Student;
-import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.utils.RegistrationResult;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -53,7 +50,7 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
 
         // Check registered courses
         log.trace("Checking registered courses for student {}", student);
-        var registeredCourses = student.getCourses();
+        markDuplicateAsFailed(student, courses, dependencyCheckResult);
 
         // Check for free slots
         log.trace("Checking for free slots for student {} and courses {}", student, courses);
@@ -74,6 +71,14 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
                 .failed(failedCourses)
                 .succeed(acceptedCourses)
                 .build();
+    }
+
+    private static void markDuplicateAsFailed(Student student, HashSet<Course> courses, RegistrationResult dependencyCheckResult) {
+        var registeredCourses = student.getCourses();
+        var duplicateCourses = new HashSet<>(courses);
+        duplicateCourses.retainAll(registeredCourses);
+        dependencyCheckResult.getFailed().addAll(duplicateCourses);
+        dependencyCheckResult.getSucceed().removeAll(duplicateCourses);
     }
 
     @Override
