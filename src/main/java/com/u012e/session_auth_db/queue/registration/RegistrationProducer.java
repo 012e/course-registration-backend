@@ -22,22 +22,18 @@ public class RegistrationProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void addCourses(Set<Course> courses, Student student) {
+    public void addCourses(Set<Long> courseIds, Student student) {
         var dto = UpdateRegistrationDto.builder()
-                .courseIds(courses.stream()
-                        .map(Course::getId)
-                        .collect(Collectors.toSet()))
+                .courseIds(courseIds)
                 .studentId(student.getId())
                 .operation(RegistrationOperation.ADD_COURSES)
                 .build();
         rabbitTemplate.convertAndSend(queue.getName(), dto);
     }
 
-    public void removeCourses(Set<Course> courses, Student student) {
+    public void removeCourses(Set<Long> courseIds, Student student) {
         var dto = UpdateRegistrationDto.builder()
-                .courseIds(courses.stream()
-                        .map(Course::getId)
-                        .collect(Collectors.toSet()))
+                .courseIds(courseIds)
                 .studentId(student.getId())
                 .operation(RegistrationOperation.REMOVE_COURSES)
                 .build();

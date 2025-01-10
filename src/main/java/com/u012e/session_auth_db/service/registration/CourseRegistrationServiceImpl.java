@@ -23,10 +23,6 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     private final CourseApplyRegistrationService courseApplyRegistrationService;
     private final StudentRepository studentRepository;
 
-    // CacheManager doesn't exist while running with cache profile
-    @Autowired(required = false)
-    private CacheManager cacheManager;
-
     public CourseRegistrationServiceImpl(
             DependencyChecker dependencyChecker,
             CourseService courseService,
@@ -77,16 +73,6 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
                 .failed(failedCourses)
                 .succeed(acceptedCourses)
                 .build();
-    }
-
-    private void evictRegisteredCoursesCache(Student student) {
-        if (cacheManager == null) return;
-
-        var registeredSubjectCache = cacheManager.getCache("registeredCourses");
-        if (registeredSubjectCache != null) {
-            log.trace("Evicting registered courses cache for student {}", student);
-            registeredSubjectCache.evict(student.getId());
-        }
     }
 
     @Override
