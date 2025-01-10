@@ -22,4 +22,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Course getCourseById(Long id);
 
     List<Course> getCoursesByIdIn(List<Long> courseIds);
+
+    List<Course> findAllByOrderByIdAsc();
+
 }

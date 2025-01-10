@@ -4,7 +4,6 @@ import com.u012e.session_auth_db.configuration.CacheConfiguration;
 import com.u012e.session_auth_db.dto.ResponseCourseDto;
 import com.u012e.session_auth_db.service.registration.ParticipantCounterService;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,6 @@ public class CachedCourseService {
     public CachedCourseService(ValueOperations<String, HashSet<Long>> registeredCourseCache,
                                ValueOperations<String, ArrayList<ResponseCourseDto>> courseCache,
                                ParticipantCounterService participantCounterService,
-                               ModelMapper modelMapper,
                                CourseService courseService) {
         this.registeredCourseCache = registeredCourseCache;
         this.courseCache = courseCache;
@@ -99,8 +97,7 @@ public class CachedCourseService {
     }
 
     public void syncCache() {
-        var courses = courseService.getAll();
-        courses.sort(Comparator.comparing(ResponseCourseDto::getId));
+        var courses = courseService.getAllOrderById();
         var key = getKeyOfCourses();
         courseCache.set(key, new ArrayList<>(courses));
     }

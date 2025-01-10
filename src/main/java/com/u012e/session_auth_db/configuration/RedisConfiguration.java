@@ -6,11 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.*;
 
 @Configuration
 public class RedisConfiguration {
@@ -21,8 +23,8 @@ public class RedisConfiguration {
     private Integer port;
 
     @Bean("redis")
-    LettuceConnectionFactory connectionFactory() {
-        var connectionFactory = new LettuceConnectionFactory();
+    JedisConnectionFactory connectionFactory() {
+        var connectionFactory = new JedisConnectionFactory();
         connectionFactory.setHostName(host);
         connectionFactory.setPort(port);
         return connectionFactory;
@@ -46,5 +48,10 @@ public class RedisConfiguration {
     @Primary
     public <T> ValueOperations<String, T> defaultValueOperations(RedisTemplate<String, T> redisTemplate) {
         return redisTemplate.opsForValue();
+    }
+
+    @Bean
+    UnifiedJedis jedis(JedisConnectionFactory jedisConnectionFactory) {
+        return new UnifiedJedis(new HostAndPort(host, port));
     }
 }

@@ -5,6 +5,7 @@ import com.u012e.session_auth_db.model.Student;
 import com.u012e.session_auth_db.model.Subject;
 import com.u012e.session_auth_db.utils.RegistrationResult;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
