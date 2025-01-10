@@ -127,7 +127,7 @@ function checkRegisteredCourses() {
 }
 
 function getAllCourses() {
-  const result = http.get(`${URL}/courses`, JSON_PARAMS);
+  const result = http.get(`${URL}/courses/`, JSON_PARAMS);
   check(result, {
     "all courses response is 200": (r) => r.status === 200,
   });
