@@ -42,6 +42,9 @@ public class DependencyExtractor {
     public Set<Subject> getDependantSubjectsRecursively(Course course) {
         log.trace("Extracting dependencies for course {}", course);
         var subject = course.getSubject();
-        return getDependantSubjectsRecursively(subject);
+        var result = getDependantSubjectsRecursively(subject);
+        log.trace("Found {} dependencies for course {}", result, course);
+        return result;
+
     }
 }
