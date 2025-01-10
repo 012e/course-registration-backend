@@ -7,11 +7,13 @@ import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.registration.DatabaseDependencyChecker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.UnifiedJedis;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseRegistrationBloomFilter {
     private final UnifiedJedis jedis;
     private final DatabaseDependencyChecker databaseDependencyChecker;
@@ -39,6 +41,7 @@ public class CourseRegistrationBloomFilter {
     }
 
     public void init() {
+        log.info("Initializing course registration bloom filter");
         jedis.del(CacheConfiguration.DEPENDENCY_CACHE);
         jedis.bfReserve(CacheConfiguration.DEPENDENCY_CACHE, 0.01, TOTAL_CAPACITY);
 
@@ -68,12 +71,16 @@ public class CourseRegistrationBloomFilter {
 
     public boolean contains(Student student, Course course) {
         String value = getValue(student, course);
+        log.trace("Checking dependency for student {} and course {}", student, course);
         if (!jedis.bfExists(CacheConfiguration.DEPENDENCY_CACHE, value)){
+            log.trace("Dependency not found in bloom filter for student {} and course {}", student, course);
             return false;
         }
         if (!jedis.bfExists(CacheConfiguration.DEPENDENCY_BACKUP_CACHE, value)){
+            log.trace("Dependency not found in backup bloom filter for student {} and course {}", student, course);
             return true;
         }
+        log.trace("Dependency found in backup bloom filter for student {} and course {}", student, course);
         return databaseDependencyChecker.checkDependency(student, course);
     }
 }
