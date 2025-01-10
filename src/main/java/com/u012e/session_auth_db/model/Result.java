@@ -25,7 +25,7 @@ public class Result implements Serializable {
     private Long id;
 
     @JsonBackReference("student-result")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, cascade = {CascadeType.MERGE})
     private Student student;
 
     @JsonBackReference("course-result")

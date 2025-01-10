@@ -1,6 +1,5 @@
 package com.u012e.session_auth_db.service.registration;
 
-import com.u012e.session_auth_db.configuration.CacheConfiguration;
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.model.Student;
 import com.u012e.session_auth_db.queue.registration.RegistrationProducer;
@@ -26,51 +25,26 @@ public class WriteBackCourseApplyRegistrationServiceImpl implements CourseApplyR
     private final RedisTemplate<String, HashSet<Long>> redisTemplate;
     private final RegistrationProducer registrationProducer;
     private final CourseService courseService;
-
-    @SafeVarargs
-    private <T> HashSet<T> union(HashSet<T>... sets) {
-        HashSet<T> flattenedSet = new HashSet<>();
-        for (HashSet<T> set : sets) {
-            flattenedSet.addAll(set);
-        }
-        return flattenedSet;
-    }
-
-    private String getKeyOfRegistration(Student student) {
-        return String.format("%s:%d", CacheConfiguration.REGISTRATION_CACHE, student.getId());
-    }
+    private final CachedRegisteredCoursesService cachedRegisteredCoursesService;
 
     @Override
     public void applyRegistration(Student student, Set<Course> courses) {
-        var cacheKey = getKeyOfRegistration(student);
         var acceptedCourseIds = courses.stream()
                 .map(Course::getId)
                 .collect(Collectors.toSet());
 
-        valueOperation.setIfAbsent(cacheKey, new HashSet<>());
-        var savedCourseIds = valueOperation.get(cacheKey);
-        if (savedCourseIds == null) {
-            throw new IllegalArgumentException("Course can't be null");
-        }
-        savedCourseIds.addAll(acceptedCourseIds);
-        valueOperation.set(cacheKey, savedCourseIds);
-
-        registrationProducer.addCourses(acceptedCourseIds, student);
+        cachedRegisteredCoursesService.saveToCache(student.getId(), acceptedCourseIds);
+       registrationProducer.addCourses(acceptedCourseIds, student);
     }
 
     @Override
     public void removeRegistration(Student student, Set<Course> courses) {
-        var cacheKey = getKeyOfRegistration(student);
-        var savedCourseIds = valueOperation.get(cacheKey);
-        if (savedCourseIds == null) {
-            throw new IllegalArgumentException("Student has not registered any courses yet.");
-        }
         var courseIdsToRemove = courses.stream()
                 .map(Course::getId)
                 .collect(Collectors.toSet());
-        savedCourseIds.removeAll(courseIdsToRemove);
-        valueOperation.set(cacheKey, savedCourseIds);
+        cachedRegisteredCoursesService.removeFromCache(student.getId(), courseIdsToRemove);
         registrationProducer.removeCourses(courseIdsToRemove, student);
     }
+
 
 }

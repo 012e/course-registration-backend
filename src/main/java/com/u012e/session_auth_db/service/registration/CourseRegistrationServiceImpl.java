@@ -21,18 +21,15 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     private final CourseService courseService;
     private final ParticipantCounterService participantCounterService;
     private final CourseApplyRegistrationService courseApplyRegistrationService;
-    private final StudentRepository studentRepository;
 
     public CourseRegistrationServiceImpl(
             DependencyChecker dependencyChecker,
             CourseService courseService,
-            StudentRepository studentRepository,
             ParticipantCounterService participantCounterService,
             CourseApplyRegistrationService courseApplyRegistrationService
     ) {
         this.dependencyChecker = dependencyChecker;
         this.courseService = courseService;
-        this.studentRepository = studentRepository;
         this.participantCounterService = participantCounterService;
         this.courseApplyRegistrationService = courseApplyRegistrationService;
     }
@@ -53,6 +50,10 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         // Check dependencies
         log.trace("Checking dependencies for student {} and courses {}", student, courses);
         var dependencyCheckResult = dependencyChecker.checkDependencies(student, courses);
+
+        // Check registered courses
+        log.trace("Checking registered courses for student {}", student);
+        var registeredCourses = student.getCourses();
 
         // Check for free slots
         log.trace("Checking for free slots for student {} and courses {}", student, courses);

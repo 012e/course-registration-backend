@@ -4,6 +4,7 @@ import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CachedCourseService;
 import com.u012e.session_auth_db.service.CourseRegistrationBloomFilter;
+import com.u012e.session_auth_db.service.registration.CachedRegisteredCoursesService;
 import com.u012e.session_auth_db.service.registration.DependencyChecker;
 import com.u012e.session_auth_db.service.syncer.ParticipantCounterSyncer;
 import com.u012e.session_auth_db.utils.GenericResponse;
@@ -24,6 +25,7 @@ public class CacheController {
     private final CachedCourseService cachedCourseService;
     private final ParticipantCounterSyncer participantCounterSyncer;
     private final CourseRegistrationBloomFilter courseRegistrationBloomFilter;
+    private final CachedRegisteredCoursesService cachedRegisteredCoursesService;
 
     @GetMapping("sync/counter")
     public GenericResponse<Object> syncCounter() {
@@ -43,6 +45,15 @@ public class CacheController {
                 .build();
     }
 
+    @GetMapping("sync/registeredCourses")
+    public GenericResponse<Object> syncRegisteredCourses() {
+        cachedCourseService.syncCache();
+        return GenericResponse.builder()
+                .message("synced registered courses successfully")
+                .data(null)
+                .build();
+    }
+
     @GetMapping("sync/courseRegistrations")
     public GenericResponse<Object> syncCourseRegistration() {
         courseRegistrationBloomFilter.init();
@@ -58,6 +69,7 @@ public class CacheController {
         participantCounterSyncer.sync();
         cachedCourseService.syncCache();
         courseRegistrationBloomFilter.init();
+        cachedRegisteredCoursesService.syncCache();
         return GenericResponse.builder()
                 .message("synced all successfully")
                 .data(null)
