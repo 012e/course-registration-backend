@@ -22,4 +22,6 @@ public interface CourseService {
     List<ResponseCourseDto> getAllRegisteredCourse(Long studentId);
 
     List<Course> getCourseByIds(List<Long> ids);
+
+    List<ResponseCourseDto> getAllOrderById();
 }

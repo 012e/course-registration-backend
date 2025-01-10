@@ -140,4 +140,12 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getCourseByIds(List<Long> ids) {
         return courseRepository.findAllById(ids);
     }
+
+    @Override
+    public List<ResponseCourseDto> getAllOrderById() {
+        return courseRepository.findAllByOrderByIdAsc()
+                .stream()
+                .map(course -> modelMapper.map(course, ResponseCourseDto.class))
+                .toList();
+    }
 }

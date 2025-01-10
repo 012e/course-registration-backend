@@ -11,4 +11,6 @@ public class CacheConfiguration {
     public static final String PARTICIPANT_CACHE = "participantCache";
     public static final String REGISTRATION_CACHE = "registrationCache";
     public static final String ALL_COURSES = "courses";
+    public static final String DEPENDENCY_CACHE = "dependencyCache";
+    public static final String DEPENDENCY_BACKUP_CACHE = "dependencyBackupCache";
 }
