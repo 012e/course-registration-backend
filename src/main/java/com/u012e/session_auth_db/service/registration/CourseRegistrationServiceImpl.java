@@ -65,18 +65,13 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         // Collect failed and accepted courses
         var failedCourses = union(dependencyCheckResult.getFailed(), freeSlotResult.getFailed());
         var acceptedCourses = freeSlotResult.getSucceed();
-        courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
         log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
         // Finally save
         log.trace("Saving student registration to database {}", student);
-        var oldCourses = student.getCourses();
-        oldCourses.addAll(acceptedCourses);
-        student.setCourses(oldCourses);
-        studentRepository.save(student);
+        courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
         log.trace("Saved student registration to database {}", student);
 
-        evictRegisteredCoursesCache(student);
 
         return RegistrationResult.builder()
                 .failed(failedCourses)
