@@ -55,9 +55,7 @@ public class WriteBackCourseApplyRegistrationServiceImpl implements CourseApplyR
         savedCourseIds.addAll(acceptedCourseIds);
         valueOperation.set(cacheKey, savedCourseIds);
 
-        var newCourses = courseService.getCourseByIds(new ArrayList<>(acceptedCourseIds));
-
-        registrationProducer.addCourses(new HashSet<>(newCourses), student);
+        registrationProducer.addCourses(acceptedCourseIds, student);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class WriteBackCourseApplyRegistrationServiceImpl implements CourseApplyR
                 .collect(Collectors.toSet());
         savedCourseIds.removeAll(courseIdsToRemove);
         valueOperation.set(cacheKey, savedCourseIds);
-        registrationProducer.removeCourses(courses, student);
+        registrationProducer.removeCourses(courseIdsToRemove, student);
     }
 
 }
