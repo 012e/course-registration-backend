@@ -7,11 +7,13 @@ import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.registration.DatabaseDependencyChecker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.UnifiedJedis;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CourseRegistrationBloomFilter {
     private final UnifiedJedis jedis;
     private final DatabaseDependencyChecker databaseDependencyChecker;
@@ -48,10 +50,12 @@ public class CourseRegistrationBloomFilter {
 
         var allStudents = studentRepository.findAll();
         var allCourses = courseRepository.findAll();
-        allStudents.parallelStream().forEach(student -> {
-            allCourses.parallelStream().forEach(course -> {
+        allStudents.forEach(student -> {
+            allCourses.forEach(course -> {
                 String value = getValue(student, course);
-                jedis.bfAdd(CacheConfiguration.DEPENDENCY_CACHE, value);
+                if (databaseDependencyChecker.checkDependency(student, course)) {
+                    jedis.bfAdd(CacheConfiguration.DEPENDENCY_CACHE, value);
+                }
             });
         });
 
