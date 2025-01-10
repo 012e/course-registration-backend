@@ -47,7 +47,7 @@ public class RabbitmqConfiguration {
         factory.setMessageConverter(messageConverter);
         factory.setBatchListener(true);
         factory.setConsumerBatchEnabled(true);
-        factory.setBatchSize(10);
+        factory.setBatchSize(100);
         return factory;
     }
 

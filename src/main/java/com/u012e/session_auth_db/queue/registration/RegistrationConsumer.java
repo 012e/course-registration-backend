@@ -5,6 +5,7 @@ import com.u012e.session_auth_db.model.Student;
 import com.u012e.session_auth_db.queue.registration.dto.UpdateRegistrationDto;
 import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class RegistrationConsumer {
     private final CourseRepository courseRepository;
 
     @RabbitListener(queues = "registration")
+    @Transactional
     public void consume(@Payload List<@Valid UpdateRegistrationDto> dtos) {
         log.trace(" [x] Received '{}'", dtos);
 
