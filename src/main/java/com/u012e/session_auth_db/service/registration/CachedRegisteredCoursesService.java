@@ -8,6 +8,7 @@ import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.repository.StudentRepository;
 import com.u012e.session_auth_db.service.CourseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,15 @@ public class CachedRegisteredCoursesService {
 
     private String getKeyOfRegistration(Long studentId) {
         return String.format("%s:%d", CacheConfiguration.REGISTRATION_CACHE, studentId);
+    }
+
+    public Set<Long> getRegisteredCourses(Long studentId) {
+        var cacheKey = getKeyOfRegistration(studentId);
+        var savedCourseIds = valueOperation.get(cacheKey);
+        if (savedCourseIds == null) {
+            throw new IllegalArgumentException("Student has not registered any courses yet.");
+        }
+        return savedCourseIds;
     }
 
     public void removeFromCache(Long studentId, Set<Long> courseIdsToRemove) {

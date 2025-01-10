@@ -2,11 +2,15 @@ package com.u012e.session_auth_db.service.registration;
 
 import com.u012e.session_auth_db.model.Course;
 import com.u012e.session_auth_db.model.Student;
+import com.u012e.session_auth_db.repository.CourseRepository;
 import com.u012e.session_auth_db.service.CourseService;
 import com.u012e.session_auth_db.utils.RegistrationResult;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +22,16 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
     private final CourseService courseService;
     private final ParticipantCounterService participantCounterService;
     private final CourseApplyRegistrationService courseApplyRegistrationService;
+
+    @Autowired(required = false)
+    private CachedRegisteredCoursesService cachedRegisteredCoursesService;
+
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
 
     public CourseRegistrationServiceImpl(
             DependencyChecker dependencyChecker,
@@ -73,12 +87,32 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
                 .build();
     }
 
-    private static void markDuplicateAsFailed(Student student, HashSet<Course> courses, RegistrationResult dependencyCheckResult) {
-        var registeredCourses = student.getCourses();
-        var duplicateCourses = new HashSet<>(courses);
-        duplicateCourses.retainAll(registeredCourses);
-        dependencyCheckResult.getFailed().addAll(duplicateCourses);
-        dependencyCheckResult.getSucceed().removeAll(duplicateCourses);
+    private void markDuplicateAsFailed(Student student, HashSet<Course> courses, RegistrationResult dependencyCheckResult) {
+        if (activeProfile.equals("cache")) {
+            markDuplicateAsFailedCache(student, courses, dependencyCheckResult);
+            return;
+        }
+        var registeredCourses = courseRepository.findByStudents(student);
+        // Intersection of registered courses and courses
+        registeredCourses.retainAll(courses);
+        dependencyCheckResult.getFailed()
+                .addAll(registeredCourses);
+        dependencyCheckResult.getSucceed()
+                .removeAll(registeredCourses);
+    }
+
+    private void markDuplicateAsFailedCache(Student student, HashSet<Course> courses, RegistrationResult dependencyCheckResult) {
+        var registerCourseIds = cachedRegisteredCoursesService.getRegisteredCourses(student.getId());
+        var duplicateCourses = new HashSet<Course>();
+        for (var course : courses) {
+            if (registerCourseIds.contains(course.getId())) {
+                duplicateCourses.add(course);
+            }
+        }
+        dependencyCheckResult.getFailed()
+                .addAll(duplicateCourses);
+        dependencyCheckResult.getSucceed()
+                .removeAll(duplicateCourses);
     }
 
     @Override
