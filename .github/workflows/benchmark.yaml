@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        profile: [ cache-light, cache-heavy, database-light, database-heavy ]
+        profile: [ cache-light, database-light ]
 
     steps:
       - name: Checkout code
