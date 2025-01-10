@@ -57,27 +57,41 @@ public class CourseRegistrationServiceImpl implements CourseRegistrationService 
         // Check dependencies
         log.trace("Checking dependencies for student {} and courses {}", student, courses);
         var dependencyCheckResult = dependencyChecker.checkDependencies(student, courses);
-        log.trace("Dependency check result: {}", dependencyCheckResult);
 
         // Check for free slots
         log.trace("Checking for free slots for student {} and courses {}", student, courses);
         var freeSlotResult = registerOnFreeSlots(dependencyCheckResult.getSucceed());
-        log.trace("Free slot result: {}", freeSlotResult);
 
         // Collect failed and accepted courses
         var failedCourses = union(dependencyCheckResult.getFailed(), freeSlotResult.getFailed());
         var acceptedCourses = freeSlotResult.getSucceed();
+        courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
         log.trace("Student {} succeed with courses: {}", student, acceptedCourses);
 
         // Finally save
         log.trace("Saving student registration to database {}", student);
-        courseApplyRegistrationService.applyRegistration(student, acceptedCourses);
+        var oldCourses = student.getCourses();
+        oldCourses.addAll(acceptedCourses);
+        student.setCourses(oldCourses);
+        studentRepository.save(student);
         log.trace("Saved student registration to database {}", student);
+
+        evictRegisteredCoursesCache(student);
 
         return RegistrationResult.builder()
                 .failed(failedCourses)
                 .succeed(acceptedCourses)
                 .build();
+    }
+
+    private void evictRegisteredCoursesCache(Student student) {
+        if (cacheManager == null) return;
+
+        var registeredSubjectCache = cacheManager.getCache("registeredCourses");
+        if (registeredSubjectCache != null) {
+            log.trace("Evicting registered courses cache for student {}", student);
+            registeredSubjectCache.evict(student.getId());
+        }
     }
 
     @Override

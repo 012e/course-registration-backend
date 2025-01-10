@@ -33,8 +33,6 @@ public class DatabaseDependencyChecker implements DependencyChecker {
     @Override
     public boolean checkDependency(Student student, Course course) {
         final var learnedSubjects = getLearnedSubjects(student);
-        log.trace("student {} learned subjects: {}", student, learnedSubjects);
-        log.trace("Checking dependencies for student {} and course {}", student, course);
         return learnedSubjects.containsAll(
                 dependencyExtractor.getDependantSubjectsRecursively(course)
         );
